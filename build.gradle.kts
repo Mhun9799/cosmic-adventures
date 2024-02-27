@@ -31,6 +31,8 @@ dependencies {
 	runtimeOnly("com.h2database:h2")
 	//SECURITY
 	implementation("org.springframework.boot:spring-boot-starter-security")
+	//WebClient
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
 }
 
 tasks.withType<KotlinCompile> {
