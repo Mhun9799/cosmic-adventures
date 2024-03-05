@@ -34,6 +34,8 @@ repositories {
 }
 
 dependencies {
+	//JAVA
+	implementation ("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.4")
 	//API
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
