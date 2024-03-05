@@ -1,4 +1,4 @@
-package org.team.b4.cosmicadventures.global.security
+package org.team.b4.cosmicadventures.global.config
 
 
 
