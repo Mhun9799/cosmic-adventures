@@ -28,9 +28,12 @@ class SecurityConfig(
             .httpBasic { it.disable() }
             .formLogin { it.disable() }
             .csrf { it.disable() }
+            .cors { it.disable() }
+            .headers { it.frameOptions { frameOptionConfig -> frameOptionConfig.disable() } }
             .authorizeHttpRequests {
                 it.requestMatchers(
                     "/login",
+                    "/h2-console/**",
                     "/signup",
                     "/api/nasa/**",
                     "/sunmoon/**",
