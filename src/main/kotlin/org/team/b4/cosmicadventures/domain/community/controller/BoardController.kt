@@ -59,4 +59,12 @@ class BoardController(
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): String =
         boardService.deleteBoard(boardId, userPrincipal)
+
+    @Operation(summary = "게시글 좋아요")
+    @PostMapping("/{boardId}")
+    fun likeUpBoard(
+        @PathVariable boardId: Long
+    ): ResponseEntity<BoardDto> {
+        return ResponseEntity.ok().body(boardService.likeUpBoard(boardId))
+    }
 }

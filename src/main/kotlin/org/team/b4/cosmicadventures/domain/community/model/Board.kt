@@ -15,17 +15,21 @@ class Board(
     @Column(nullable = false)
     val content: String,
 
-    @Column(name = "name", nullable = false)
-    val nickName: Profile? = null,
+    @Embedded
+    var nickName: Profile,
 
     @Column(name = "count")
-    val likeCount: Int = 0,
+    var likeCount: Int = 0,
 
     @JoinColumn(name = "user_id", nullable = false)
     @ManyToOne
-    val user: User? = null
+    val user: User
 ) : BaseEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
+
+    fun likeUp() {
+        likeCount += 1
+    }
 }

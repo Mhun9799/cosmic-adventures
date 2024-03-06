@@ -21,4 +21,7 @@ interface BoardService {
     //게시글 단건조회
     fun getBoard(boardId: Long): BoardDto
 
+    // 게시글 좋아요
+    fun likeUpBoard(boardId: Long): BoardDto
+
 }
