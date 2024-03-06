@@ -7,7 +7,6 @@ plugins {
 	kotlin("plugin.noarg") version "1.8.22"
 	kotlin("plugin.spring") version "1.9.22"
 	kotlin("plugin.jpa") version "1.9.22"
-	kotlin("plugin.noarg") version "1.8.22"
 	kotlin("kapt") version "1.8.22"
 }
 
