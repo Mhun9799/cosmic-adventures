@@ -1,4 +1,4 @@
-package org.team.b4.cosmicadventures.global.security
+package org.team.b4.cosmicadventures.global.config
 
 
 
@@ -28,9 +28,12 @@ class SecurityConfig(
             .httpBasic { it.disable() }
             .formLogin { it.disable() }
             .csrf { it.disable() }
+            .cors { it.disable() }
+            .headers { it.frameOptions { frameOptionConfig -> frameOptionConfig.disable() } }
             .authorizeHttpRequests {
                 it.requestMatchers(
                     "/login",
+                    "/h2-console/**",
                     "/signup",
                     "/api/v1/nasa/**",
                     "/api/v1/sunmoon/**",

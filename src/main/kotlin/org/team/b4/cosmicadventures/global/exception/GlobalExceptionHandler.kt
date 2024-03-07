@@ -14,4 +14,8 @@ class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse(e.message))
     }
 
+    @ExceptionHandler(UserNotMatchedException::class)
+    fun handleUserNotMatchedException(e: UserNotMatchedException): ResponseEntity<ErrorResponse> {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse(e.message))
+    }
 }
