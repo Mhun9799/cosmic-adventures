@@ -1,12 +1,12 @@
 package org.team.b4.cosmicadventures.domain.community.dto
 
 import org.team.b4.cosmicadventures.domain.community.model.Comment
-import org.team.b4.cosmicadventures.domain.user.model.Profile
+
 
 data class CommentDto(
     val id: Long,
     val content: String,
-    val name: Profile,
+    val name: String,
     val likeCount: Int,
 ) {
     companion object {

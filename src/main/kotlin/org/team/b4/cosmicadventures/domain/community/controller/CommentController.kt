@@ -48,6 +48,7 @@ class CommentController(
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): String =
         commentService.deleteComment(commentId, userPrincipal)
+
     @Operation(summary = "댓글 좋아요")
     @PostMapping("/{commentId}")
     fun likeUpComment(

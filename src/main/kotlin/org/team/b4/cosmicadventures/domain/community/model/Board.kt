@@ -2,7 +2,6 @@ package org.team.b4.cosmicadventures.domain.community.model
 
 
 import jakarta.persistence.*
-import org.team.b4.cosmicadventures.domain.user.model.Profile
 import org.team.b4.cosmicadventures.domain.user.model.User
 import org.team.b4.cosmicadventures.global.model.BaseEntity
 
@@ -15,8 +14,8 @@ class Board(
     @Column(nullable = false)
     val content: String,
 
-    @Embedded
-    var nickName: Profile,
+    @Column(name = "name" )
+    var nickName: String,
 
     @Column(name = "count")
     var likeCount: Int = 0,
