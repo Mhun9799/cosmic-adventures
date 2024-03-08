@@ -1,0 +1,44 @@
+spring:
+  # MAIL
+  mail:
+    host: smtp.naver.com
+    port: 465
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+            trust: smtp.naver.com
+          starttls: true
+  # DB Settings
+  data:
+    redis:
+      host: localhost  # Redis 호스트 주소
+      port: 6379       # Redis 포트
+      database: 0      # Redis 데이터베이스 번호
+      lettuce:
+        pool:
+          max-active: 8  # 최대 활성 커넥션 수
+          max-idle: 8    # 최대 유휴 커넥션 수
+          min-idle: 2    # 최소 유휴 커넥션 수
+          max-wait: -1   # 최대 대기 시간 (-1은 무제한)
+      password:
+  # Hibernate
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+#JWT
+auth:
+  jwt:
+    issuer: team.sparta.com
+    secret: 52DANSJDNASJnjdgsnjFDNJSDFSDFDSF
+    accessTokenExpirationMinutes: 30
+    refreshTokenExpirationDays: 1
+    setFrom: abczza@naver.com
+
+# Log
+logging:
+  level:
+    org.hibernate.sql: debug

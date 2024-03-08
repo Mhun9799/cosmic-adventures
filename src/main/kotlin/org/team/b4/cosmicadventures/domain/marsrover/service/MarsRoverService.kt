@@ -52,29 +52,3 @@ class MarsRoverService(
         return randomPhoto
     }
 }
-
-/*@Service
-class MarsRoverService(
-) {
-
-
-    fun getRecentMarsRoverData(): String {
-        val apiKey = "DEMO_KEY"
-        // NASA API를 통해 최신 사진을 가져오기 위한 엔드포인트
-        val apiUrl = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/latest_photos?api_key=$apiKey"
-        val client = WebClient.create()
-        // WebClient를 사용하여 외부 API에 HTTP 요청을 보냄
-        val response = client.get()
-            .uri(apiUrl)
-            .retrieve()
-            .bodyToMono(String::class.java)
-            .block()
-        // API 응답을 객체로 매핑
-        val objectMapper = ObjectMapper()
-        val prettyResponse = objectMapper.readValue(response, Any::class.java)
-        // 객체를 이쁘게 출력한 JSON 문자열로 변환
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResponse)
-    }
-
-}*/
-
