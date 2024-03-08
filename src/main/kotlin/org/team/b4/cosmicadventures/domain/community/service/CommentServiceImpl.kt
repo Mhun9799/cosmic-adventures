@@ -53,7 +53,7 @@ class CommentServiceImpl(
 
     override fun likeUpComment(commentId: Long): CommentDto {
         val comment = commentRepository.findByIdOrNull(commentId) ?: throw ModelNotFoundException("comment", commentId)
-        comment.likeCount
+        comment.likeUp()
         return CommentDto.from(comment)
     }
 }

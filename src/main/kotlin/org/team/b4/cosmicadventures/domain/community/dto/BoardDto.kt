@@ -1,7 +1,7 @@
 package org.team.b4.cosmicadventures.domain.community.dto
 
 import org.team.b4.cosmicadventures.domain.community.model.Board
-import org.team.b4.cosmicadventures.domain.user.model.Profile
+
 
 data class BoardDto(
     val id: Long,
@@ -16,7 +16,7 @@ data class BoardDto(
                 id = board.id!!,
                 title = board.title,
                 content = board.content,
-                name = board.nickName.nickname,
+                name = board.nickName,
                 likeCount = board.likeCount
             )
     }

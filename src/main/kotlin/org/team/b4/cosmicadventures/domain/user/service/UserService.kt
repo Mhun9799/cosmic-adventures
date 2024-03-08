@@ -1,14 +1,20 @@
 package org.team.b4.cosmicadventures.domain.user.service
 
 
-import org.team.b4.cosmicadventures.domain.user.dto.*
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
+import org.team.b4.cosmicadventures.domain.user.dto.request.LoginRequest
+import org.team.b4.cosmicadventures.domain.user.dto.request.SignUpRequest
+import org.team.b4.cosmicadventures.domain.user.dto.request.UpdateUserPasswordRequest
+import org.team.b4.cosmicadventures.domain.user.dto.request.UpdateUserProfileRequest
+import org.team.b4.cosmicadventures.domain.user.dto.response.LoginResponse
+import org.team.b4.cosmicadventures.domain.user.dto.response.UserResponse
 
 interface UserService {
 
         fun signUp(request: SignUpRequest): UserResponse
-
         fun updateUserProfile(userId: Long, request: UpdateUserProfileRequest): UserResponse
-
-        fun login(request: LoginRequest): LoginResponse
-
+        fun login(request: LoginRequest,response: HttpServletResponse): LoginResponse
+        fun updatePassword(userId: Long,request: UpdateUserPasswordRequest):String
+        fun logout(response: HttpServletResponse, request: HttpServletRequest)
 }

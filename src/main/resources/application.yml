@@ -1,13 +1,17 @@
 spring:
+  # MAIL
+  mail:
+    host: smtp.naver.com
+    port: 465
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+            trust: smtp.naver.com
+          starttls: true
   # DB Settings
-  datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:~/space
-    username: hyeonseok
-    password:
-  #  datasource:
-  cache:
-    type: redis
   data:
     redis:
       host: localhost  # Redis 호스트 주소
@@ -24,11 +28,16 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
+#JWT
 auth:
   jwt:
     issuer: team.sparta.com
     secret: 52DANSJDNASJnjdgsnjFDNJSDFSDFDSF
-    accessTokenExpirationHour: 168
+    accessTokenExpirationMinutes: 30
+    refreshTokenExpirationDays: 1
+    setFrom: abczza@naver.com
+
 # Log
 logging:
   level:

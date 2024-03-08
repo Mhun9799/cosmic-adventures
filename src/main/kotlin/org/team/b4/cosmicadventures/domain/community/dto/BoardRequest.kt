@@ -13,7 +13,7 @@ data class BoardRequest(
             title = this.title,
             content = this.content,
             user = user,
-            nickName = user.profile
+            nickName = user.name
         )
     }
 }

@@ -34,11 +34,18 @@ repositories {
 }
 
 dependencies {
+	//MAIL
+	implementation ("org.springframework.boot:spring-boot-starter-mail")
+	//Valid
+	implementation("org.springframework.boot:spring-boot-starter-validation")
 	//JAVA
 	implementation ("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.4")
+	//AWS
+	implementation("org.springframework.cloud:spring-cloud-starter-aws:2.0.1.RELEASE")
 	//API
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+	implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.0")
 	//xml형변환
 	implementation ("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.0")
 	//WEB
@@ -51,8 +58,8 @@ dependencies {
 	//REFLECTION
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	//DB
-	runtimeOnly("com.h2database:h2")
-//	runtimeOnly("org.postgresql:postgresql")
+//	runtimeOnly("com.h2database:h2")
+	runtimeOnly("org.postgresql:postgresql")
 	//SECURITY
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("io.jsonwebtoken:jjwt-api:0.12.3")
