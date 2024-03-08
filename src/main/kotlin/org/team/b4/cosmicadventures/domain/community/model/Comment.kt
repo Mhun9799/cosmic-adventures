@@ -3,7 +3,6 @@ package org.team.b4.cosmicadventures.domain.community.model
 import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import org.team.b4.cosmicadventures.domain.community.dto.CommentRequest
-import org.team.b4.cosmicadventures.domain.user.model.Profile
 import org.team.b4.cosmicadventures.domain.user.model.User
 
 @Entity
@@ -13,7 +12,7 @@ class Comment(
     var content: String,
 
     @Column
-    val name: Profile,
+    val name: String,
 
     @Column(name = "count")
     var likeCount: Int = 0,

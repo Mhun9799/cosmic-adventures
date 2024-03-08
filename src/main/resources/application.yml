@@ -1,4 +1,16 @@
 spring:
+  # MAIL
+  mail:
+    host: smtp.naver.com
+    port: 465
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+            trust: smtp.naver.com
+          starttls: true
   # DB Settings
   h2:
     console:
@@ -28,11 +40,16 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
+#JWT
 auth:
   jwt:
     issuer: team.sparta.com
     secret: 52DANSJDNASJnjdgsnjFDNJSDFSDFDSF
-    accessTokenExpirationHour: 168
+    accessTokenExpirationMinutes: 30
+    refreshTokenExpirationDays: 1
+    setFrom: abczza@naver.com
+
 # Log
 logging:
   level:

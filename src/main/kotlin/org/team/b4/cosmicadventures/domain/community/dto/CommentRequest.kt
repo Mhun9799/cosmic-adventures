@@ -11,7 +11,7 @@ data class CommentRequest(
         Comment(
             content = this.content,
             board = board,
-            name = user.profile,
+            name = user.name,
             user = user
         )
 }
