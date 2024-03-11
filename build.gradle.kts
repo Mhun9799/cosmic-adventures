@@ -34,6 +34,10 @@ repositories {
 }
 
 dependencies {
+	//OAUTH
+	implementation ("org.springframework.boot:spring-boot-starter-jdbc")
+	implementation ("org.springframework.boot:spring-boot-starter-oauth2-client")
+	implementation ("org.springframework.boot:spring-boot-starter-thymeleaf")
 	//MAIL
 	implementation ("org.springframework.boot:spring-boot-starter-mail")
 	//Valid
