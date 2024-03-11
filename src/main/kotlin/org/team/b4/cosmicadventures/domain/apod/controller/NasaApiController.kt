@@ -9,7 +9,7 @@ import org.team.b4.cosmicadventures.domain.apod.service.NasaImageService
 import reactor.core.publisher.Mono
 
 @RestController
-@RequestMapping("/api/nasa")
+@RequestMapping("/api/v1/nasa")
 class NasaApiController(
     private val nasaImageService: NasaImageService
 ) {

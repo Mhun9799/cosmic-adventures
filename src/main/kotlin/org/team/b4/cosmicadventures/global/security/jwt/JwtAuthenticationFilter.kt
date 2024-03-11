@@ -10,6 +10,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import org.team.b4.cosmicadventures.global.security.UserPrincipal
+import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.Private
 
 @Component
 class JwtAuthenticationFilter(
