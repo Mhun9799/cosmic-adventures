@@ -6,9 +6,6 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.team.b4.cosmicadventures.domain.donki.dto.request.*
-//import org.team.b4.cosmicadventures.domain.donki.model.Instrument
-//import org.team.b4.cosmicadventures.domain.donki.model.LinkedEvent
-//import org.team.b4.cosmicadventures.domain.donki.model.Mpc
 import org.team.b4.cosmicadventures.domain.donki.model.News
 import org.team.b4.cosmicadventures.domain.donki.repository.DonkiRepository
 import java.time.LocalDate
@@ -18,7 +15,8 @@ import java.time.format.DateTimeFormatter
 @Service
 class DonkiServiceImpl(
     private val donkiRepository: DonkiRepository,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val webClientBuilder: WebClient.Builder
 ) : DonkiService {
     companion object {
         const val API_KEY = "CF7Jy0Yjlf3vGkZLVpS2ZF3nYWmatYUVfcZMxhuR"
@@ -35,7 +33,7 @@ class DonkiServiceImpl(
 // 스케쥴러로 정해진 시각에 불러오는 로직입니다. 테스트해야 하기 때문에 일단 주석처리
 
 
-    fun saveAllFromApi() {
+    override fun saveAllFromApi() {
         val yesterday = LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE)
         saveFromApi("$BASE_URL/MPC?startDate=$yesterday&endDate=$yesterday&api_key=$API_KEY", mpcResponseExtractor)
         saveFromApi("$BASE_URL/SEP?startDate=$yesterday&endDate=$yesterday&api_key=$API_KEY", sepResponseExtractor)
@@ -45,7 +43,7 @@ class DonkiServiceImpl(
     }
 
     override fun saveFromApi(apiUrl: String, extractor: (JsonNode) -> News) {
-        val client = WebClient.create()
+        val client = webClientBuilder.build()
         val responseSpec = client.get()
             .uri(apiUrl)
             .retrieve()
@@ -53,7 +51,9 @@ class DonkiServiceImpl(
 
         if (!response.isNullOrEmpty()) {
             val nodeList = objectMapper.readTree(response)
-            val newsList = nodeList.map { node -> extractor(node) }
+            val newsList = nodeList.mapNotNull { node ->
+                if (node["eventTime"].asText() != "null") extractor(node) else null
+            }
             donkiRepository.saveAll(newsList) // EntityManager 사용
         }
     }

@@ -10,11 +10,11 @@ import org.team.b4.cosmicadventures.domain.donki.service.DonkiServiceImpl
 
 @RestController
 class DonkiController(
-    private val donkiServiceImpl: DonkiServiceImpl
+    private val donkiService: DonkiService
 ) {
     @GetMapping("/saveNews")
     fun saveNewsFromApi(): ResponseEntity<Unit> {
-        donkiServiceImpl.saveAllFromApi()
+        donkiService.saveAllFromApi()
         return ResponseEntity.ok(Unit)
     }
 }
