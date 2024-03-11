@@ -6,24 +6,15 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.team.b4.cosmicadventures.domain.donki.service.DonkiService
+import org.team.b4.cosmicadventures.domain.donki.service.DonkiServiceImpl
 
 @RestController
 class DonkiController(
-    private val donkiService: DonkiService
+    private val donkiServiceImpl: DonkiServiceImpl
 ) {
-    @GetMapping("/mpc")
-    fun saveMpcFromApi(): ResponseEntity<Unit> {
-        donkiService.saveMpcFromApi()
-        return ResponseEntity.ok(Unit)
-    }
-    @GetMapping("/sep")
-    fun saveSepFromApi(): ResponseEntity<Unit> {
-        donkiService.saveSepFromApi()
-        return ResponseEntity.ok(Unit)
-    }
-    @GetMapping("/cme")
-    fun saveCmeFromApi(): ResponseEntity<Unit> {
-        donkiService.saveCmeFromApi()
+    @GetMapping("/saveNews")
+    fun saveNewsFromApi(): ResponseEntity<Unit> {
+        donkiServiceImpl.saveAllFromApi()
         return ResponseEntity.ok(Unit)
     }
 }
