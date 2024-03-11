@@ -1,4 +1,4 @@
-package org.team.b4.cosmicadventures.domain.oauth2.config
+package org.team.b4.cosmicadventures.global.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
