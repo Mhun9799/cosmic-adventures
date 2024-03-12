@@ -18,9 +18,13 @@ class BoardServiceImpl(
     private val boardRepository: BoardRepository,
     private val userRepository: UserRepository
 ) : BoardService {
-    // 게시글 목록조회
-    override fun getListBoard(): List<BoardDto> =
-        boardRepository.findAll().map { BoardDto.from(it) }
+    // 게시글 목록조회 작성일순으로 오름차순
+    override fun getListBoardByCreateAtASc(): List<BoardDto> =
+        boardRepository.getBoardByCreateAt().map { BoardDto.from(it) }
+
+    // 게시글 목록조회 좋아요 순
+    override fun getListBoardByLikeUp(): List<BoardDto> =
+        boardRepository.getBoardByLikeUp().map { BoardDto.from(it) }
 
     //게시글 단건조회
     override fun getBoard(boardId: Long): BoardDto {
