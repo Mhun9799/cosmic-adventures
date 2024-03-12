@@ -3,11 +3,13 @@ package org.team.b4.cosmicadventures.domain.community.service
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 import org.team.b4.cosmicadventures.domain.community.dto.BoardDto
 import org.team.b4.cosmicadventures.domain.community.dto.BoardRequest
 import org.team.b4.cosmicadventures.domain.community.model.Board
 import org.team.b4.cosmicadventures.domain.community.repository.BoardRepository
 import org.team.b4.cosmicadventures.domain.user.repository.UserRepository
+import org.team.b4.cosmicadventures.global.aws.S3Service
 import org.team.b4.cosmicadventures.global.exception.ModelNotFoundException
 import org.team.b4.cosmicadventures.global.exception.UserNotMatchedException
 import org.team.b4.cosmicadventures.global.security.UserPrincipal
@@ -16,7 +18,8 @@ import org.team.b4.cosmicadventures.global.security.UserPrincipal
 @Transactional
 class BoardServiceImpl(
     private val boardRepository: BoardRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val s3Service: S3Service
 ) : BoardService {
     // 게시글 목록조회
     override fun getListBoard(): List<BoardDto> =
@@ -29,7 +32,12 @@ class BoardServiceImpl(
     }
 
     //게시글 작성
-    override fun createBoard(boardRequest: BoardRequest, userPrincipal: UserPrincipal): BoardDto {
+    override fun createBoard(
+        boardRequest: BoardRequest,
+        userPrincipal: UserPrincipal
+    ): BoardDto {
+        //S3 에서 이미지 url 받아옴
+        s3Service.upload(boardRequest.image!!, "board").toMutableList()
         val users =
             userRepository.findByIdOrNull(userPrincipal.id) ?: throw ModelNotFoundException("user", userPrincipal.id)
         val board = boardRepository.save(boardRequest.to(users))
