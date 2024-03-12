@@ -1,4 +1,4 @@
-package org.team.b4.cosmicadventures.global.redis
+package org.team.b4.cosmicadventures.global.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.beans.factory.annotation.Value
