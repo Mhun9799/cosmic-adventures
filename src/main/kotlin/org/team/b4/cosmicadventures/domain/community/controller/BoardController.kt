@@ -28,7 +28,7 @@ class BoardController(
     ): ResponseEntity<List<BoardDto>> =
         ResponseEntity.ok().body(boardService.getListBoardByCreateAtASc())
     @Operation(summary = "게시글 목록 조회 좋아요 순")
-    @GetMapping
+    @GetMapping("/like")
     fun getListBoardByLikeUp(
     ): ResponseEntity<List<BoardDto>> =
         ResponseEntity.ok().body(boardService.getListBoardByLikeUp())
@@ -49,7 +49,7 @@ class BoardController(
         ResponseEntity.created(URI.create("/")).body(boardService.createBoard(boardRequest, userPrincipal))
 
     @Operation(summary = "게시글 수정")
-    @PutMapping("{boardId}")
+    @PutMapping("/{boardId}")
     fun updateBoard(
         @PathVariable boardId: Long,
         @RequestBody boardRequest: BoardRequest,
