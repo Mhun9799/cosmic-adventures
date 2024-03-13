@@ -29,6 +29,7 @@ class User(
 
     @Column(name = "profile_pic_url")
     @Convert(converter = StringMutableListConverter::class)
+    //사용자가 프로필 이미지를 업로드하지 않았을 때, 사용되는 기본 이미지 URL
     var profilePicUrl: MutableList<String> = mutableListOf("https://imgur.com/S8jQ6wN"),
 
     @Column(name = "verification_code")
