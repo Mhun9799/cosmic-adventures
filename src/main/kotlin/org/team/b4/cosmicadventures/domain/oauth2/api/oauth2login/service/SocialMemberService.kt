@@ -29,15 +29,4 @@ class SocialMemberService(
             userRepository.save(newUser)
         }
     }
-
-        /*fun registerIfAbsent(userInfo: OAuth2LoginUserInfo): SocialMember {
-            return socialMemberRepository.findByProviderAndProviderId(userInfo.provider, userInfo.id) ?: run {
-                val socialMember = SocialMember(
-                    provider = userInfo.provider,
-                    providerId = userInfo.id,
-                    nickname = userInfo.nickname
-                )
-                socialMemberRepository.save(socialMember)
-            }
-        }*/
 }
