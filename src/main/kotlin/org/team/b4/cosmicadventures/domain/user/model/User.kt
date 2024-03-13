@@ -2,6 +2,7 @@ package org.team.b4.cosmicadventures.domain.user.model
 
 
 import jakarta.persistence.*
+import org.team.b4.cosmicadventures.domain.oauth2.domain.entity.OAuth2Provider
 import org.team.b4.cosmicadventures.global.security.RefreshToken.model.RefreshToken
 import org.team.b4.cosmicadventures.global.StringMutableListConverter
 import org.team.b4.cosmicadventures.global.model.BaseEntity
@@ -32,6 +33,13 @@ class User(
 
     @Column(name = "verification_code")
     var verificationCode: String? = null,
+
+    @Column(name = "provider_id")
+    val providerId: String? = null,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider")
+    val provider: OAuth2Provider? = null,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
