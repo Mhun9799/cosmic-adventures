@@ -38,6 +38,10 @@ class User(
     @Column(name = "provider_id")
     val providerId: String? = null,
 
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    var status: Status,
+
     @Enumerated(EnumType.STRING)
     @Column(name = "provider")
     val provider: OAuth2Provider? = null,
