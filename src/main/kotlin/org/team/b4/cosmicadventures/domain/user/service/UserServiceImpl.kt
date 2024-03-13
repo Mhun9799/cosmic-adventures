@@ -95,17 +95,20 @@ class UserServiceImpl(
         jwtPlugin.invalidateToken(accessToken)
     }
 
-    @Transactional
     override fun withdrawal(userId: Long) {
-
-        val authenticatedId: Long = (SecurityContextHolder.getContext().authentication.principal as UserPrincipal).id
-        if (userId != authenticatedId) {
-            throw IllegalArgumentException("탈퇴 권한이 없습니다.")
+        val principal = SecurityContextHolder.getContext().authentication.principal
+        if (principal is UserPrincipal) {
+            val authenticatedId: Long = principal.id
+            if (userId != authenticatedId) {
+                throw IllegalArgumentException("탈퇴 권한이 없습니다.")
+            }
+            val user = userRepository.findById(userId)
+                .orElseThrow { throw IllegalArgumentException("해당 회원을 찾을 수 없습니다.") }
+            user.status = Status.WITHDRAWAL
+            userRepository.save(user)
+        } else {
+            throw IllegalStateException("로그인을 해주세요.")
         }
-        val user = userRepository.findById(userId)
-            .orElseThrow { throw IllegalArgumentException("해당 회원을 찾을 수 없습니다.") }
-        user.status= Status.WITHDRAWAL
-        userRepository.save(user)
     }
 
     override fun updatePassword(
