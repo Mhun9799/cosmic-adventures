@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.multipart.MultipartFile
 import org.team.b4.cosmicadventures.domain.user.model.Role
+import org.team.b4.cosmicadventures.domain.user.model.Status
 import org.team.b4.cosmicadventures.domain.user.model.User
 import org.team.b4.cosmicadventures.global.validation.ValidPassword
 import org.team.b4.cosmicadventures.global.validation.ValidTlno
@@ -43,7 +44,8 @@ data class SignUpRequest(
             email = email,
             password = password,
             introduction = introduction,
-            tlno = tlno
+            tlno = tlno,
+            status = Status.NORMAL
         )
 
         //여기서는 회원가입 요청이 들어올 때, 프로필 이미지가 없을 경우에 대비하여 기본 이미지 URL을 설정

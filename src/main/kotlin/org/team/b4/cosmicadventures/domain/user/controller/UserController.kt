@@ -106,4 +106,11 @@ class UserController(
             .ok(blacklistedTokens)
     }
 
+
+    @Operation(summary = "회원 탈퇴")
+    @DeleteMapping("/withdrawal/{userId}")
+    fun withdrawal(@PathVariable userId: Long): ResponseEntity<String> {
+        userService.withdrawal(userId)
+        return ResponseEntity.ok("회원 탈퇴가 성공적으로 처리되었습니다.")
+    }
 }

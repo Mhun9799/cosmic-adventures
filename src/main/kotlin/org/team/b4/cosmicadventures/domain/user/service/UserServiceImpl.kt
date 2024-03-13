@@ -95,6 +95,19 @@ class UserServiceImpl(
         jwtPlugin.invalidateToken(accessToken)
     }
 
+    @Transactional
+    override fun withdrawal(userId: Long) {
+
+        val authenticatedId: Long = (SecurityContextHolder.getContext().authentication.principal as UserPrincipal).id
+        if (userId != authenticatedId) {
+            throw IllegalArgumentException("탈퇴 권한이 없습니다.")
+        }
+        val user = userRepository.findById(userId)
+            .orElseThrow { throw IllegalArgumentException("해당 회원을 찾을 수 없습니다.") }
+        user.status= Status.WITHDRAWAL
+        userRepository.save(user)
+    }
+
     override fun updatePassword(
         userId: Long,
         request: UpdateUserPasswordRequest
@@ -145,11 +158,9 @@ class UserServiceImpl(
             if (uploadedImageStrings != null) {
                 profilePicUrl = uploadedImageStrings
             }
-
         })
         val verificationCode = UUID.randomUUID().toString().substring(0, 6)
         user.verificationCode = verificationCode
-
         userRepository.save(user)
         emailService.sendVerificationEmail(user.email, verificationCode)
         return UserResponse.from(user)
@@ -177,6 +188,7 @@ class UserServiceImpl(
         }
         return UserResponse.from(user)
     }
+
 
 
 
