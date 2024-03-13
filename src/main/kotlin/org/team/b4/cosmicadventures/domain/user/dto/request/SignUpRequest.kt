@@ -33,15 +33,21 @@ data class SignUpRequest(
     var profilePic:MutableList<MultipartFile>?
 ){
     fun isPicsEmpty(): Boolean {
-        return profilePic?.get(0)?.originalFilename == ""
+        return profilePic?.getOrNull(0)?.originalFilename.isNullOrEmpty()
     }
 
-    fun to() = User (
-        role = Role.USER,
-        name = name,
-        email = email,
-        password = password,
-        introduction = introduction,
-        tlno = tlno,
-    )
+    fun to(): User {
+        val user = User(
+            role = Role.USER,
+            name = name,
+            email = email,
+            password = password,
+            introduction = introduction,
+            tlno = tlno
+        )
+
+        //여기서는 회원가입 요청이 들어올 때, 프로필 이미지가 없을 경우에 대비하여 기본 이미지 URL을 설정
+        user.profilePicUrl = listOf("https://imgur.com/S8jQ6wN").toMutableList()
+        return user
+    }
 }

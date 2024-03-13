@@ -3,6 +3,7 @@ package org.team.b4.cosmicadventures.domain.user.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.stereotype.Service
@@ -16,7 +17,7 @@ class SlangFilterService(
     private val logger = LoggerFactory.getLogger(SlangFilterService::class.java)
 
     fun isCleanText(userInput: String): Boolean {
-        val openaiApiKey = "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"
+        val openaiApiKey = "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"
         val apiUrl = "https://api.openai.com/v1/chat/completions"
         val requestBody = mapOf(
             "model" to "gpt-3.5-turbo",
