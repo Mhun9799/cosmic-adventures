@@ -8,7 +8,8 @@ data class BoardDto(
     val title: String,
     val content: String,
     val name: String,
-    val likeCount: Int
+    val likeCount: Int,
+    val image: MutableList<String>?
 ) {
     companion object {
         fun from(board: Board): BoardDto =
@@ -17,7 +18,8 @@ data class BoardDto(
                 title = board.title,
                 content = board.content,
                 name = board.nickName,
-                likeCount = board.likeCount
+                likeCount = board.likeCount,
+                image = board.image
             )
     }
 

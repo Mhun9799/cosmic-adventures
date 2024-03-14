@@ -21,9 +21,13 @@ class BoardServiceImpl(
     private val userRepository: UserRepository,
     private val s3Service: S3Service
 ) : BoardService {
-    // 게시글 목록조회
-    override fun getListBoard(): List<BoardDto> =
-        boardRepository.findAll().map { BoardDto.from(it) }
+    // 게시글 목록조회 작성일순으로 오름차순
+    override fun getListBoardByCreateAtASc(): List<BoardDto> =
+        boardRepository.getBoardByCreateAt().map { BoardDto.from(it) }
+
+    // 게시글 목록조회 좋아요 순
+    override fun getListBoardByLikeUp(): List<BoardDto> =
+        boardRepository.getBoardByLikeUp().map { BoardDto.from(it) }
 
     //게시글 단건조회
     override fun getBoard(boardId: Long): BoardDto {
@@ -37,18 +41,19 @@ class BoardServiceImpl(
         userPrincipal: UserPrincipal
     ): BoardDto {
         //S3 에서 이미지 url 받아옴
-        s3Service.upload(boardRequest.image!!, "board").toMutableList()
+        val image = s3Service.upload(boardRequest.image!!, "board").toMutableList()
         val users =
             userRepository.findByIdOrNull(userPrincipal.id) ?: throw ModelNotFoundException("user", userPrincipal.id)
-        val board = boardRepository.save(boardRequest.to(users))
+        val board = boardRepository.save(boardRequest.to(users, image))
         return BoardDto.from(board)
     }
 
     //게시글 수정
     override fun updateBoard(boardId: Long, boardRequest: BoardRequest, userPrincipal: UserPrincipal): BoardDto {
+        val image = s3Service.upload(boardRequest.image!!, "board").toMutableList()
         val users = userRepository.findByIdOrNull(userPrincipal.id) ?: throw ModelNotFoundException("user", userPrincipal.id)
         boardRepository.findByIdAndUserId(boardId, userPrincipal.id) ?: throw UserNotMatchedException()
-        return BoardDto.from(boardRepository.save(boardRequest.to(users)))
+        return BoardDto.from(boardRepository.save(boardRequest.to(users, image)))
     }
 
     //게시글 삭제

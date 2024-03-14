@@ -10,12 +10,13 @@ data class BoardRequest(
     val content: String,
     val image: MutableList<MultipartFile>?
 ) {
-    fun to(user: User): Board {
+    fun to(user: User, image: MutableList<String>): Board {
         return Board(
             title = this.title,
             content = this.content,
             user = user,
             nickName = user.name,
+            image = image
         )
     }
 }

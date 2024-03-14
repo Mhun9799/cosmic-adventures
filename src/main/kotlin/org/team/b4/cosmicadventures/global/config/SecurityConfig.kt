@@ -1,7 +1,6 @@
 package org.team.b4.cosmicadventures.global.config
 
 
-
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
@@ -42,7 +41,7 @@ class SecurityConfig(
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
 
-                ).permitAll()
+                    ).permitAll()
                     // 위 URI를 제외하곤 모두 인증이 되어야 함.
                     .anyRequest().authenticated()
             }
