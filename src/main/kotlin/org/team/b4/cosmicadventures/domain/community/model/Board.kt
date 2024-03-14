@@ -3,6 +3,7 @@ package org.team.b4.cosmicadventures.domain.community.model
 
 import jakarta.persistence.*
 import org.team.b4.cosmicadventures.domain.user.model.User
+import org.team.b4.cosmicadventures.global.StringMutableListConverter
 import org.team.b4.cosmicadventures.global.model.BaseEntity
 
 @Entity
@@ -19,6 +20,10 @@ class Board(
 
     @Column(name = "count")
     var likeCount: Int = 0,
+
+    @Column(name = "image")
+    @Convert(converter = StringMutableListConverter::class)
+    val image: MutableList<String>? = null,
 
     @JoinColumn(name = "user_id", nullable = false)
     @ManyToOne
