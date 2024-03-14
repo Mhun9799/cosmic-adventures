@@ -31,13 +31,13 @@ class SecurityConfig(
             .headers { it.frameOptions { frameOptionConfig -> frameOptionConfig.disable() } }
             .authorizeHttpRequests {
                 it.requestMatchers(
-                    "/login",
+                    "/api/v1/users/login",
+                    "/api/v1/users/signup",
                     "/h2-console/**",
-                    "/signup",
                     "/api/v1/nasa/**",
                     "/api/v1/sunmoon/**",
                     "/api/v1/mars-rovers/**",
-                    "/**",
+                    "/api/v1/iss/**",
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
 

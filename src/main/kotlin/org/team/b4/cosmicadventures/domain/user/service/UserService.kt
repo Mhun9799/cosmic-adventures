@@ -18,4 +18,5 @@ interface UserService {
         fun updatePassword(userId: Long,request: UpdateUserPasswordRequest):String
         fun logout(response: HttpServletResponse, request: HttpServletRequest)
         fun withdrawal(userId: Long)
+        fun getUserProfile(userId: Long):UserResponse
 }

@@ -17,7 +17,7 @@ class SlangFilterService(
     private val logger = LoggerFactory.getLogger(SlangFilterService::class.java)
 
     fun isCleanText(userInput: String): Boolean {
-        val openaiApiKey = "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"
+        val openaiApiKey = "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"
         val apiUrl = "https://api.openai.com/v1/chat/completions"
         val requestBody = mapOf(
             "model" to "gpt-3.5-turbo",

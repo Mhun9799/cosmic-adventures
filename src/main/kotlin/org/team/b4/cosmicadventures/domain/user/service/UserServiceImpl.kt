@@ -1,7 +1,6 @@
 package org.team.b4.cosmicadventures.domain.user.service
 
 
-
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -42,7 +41,7 @@ class UserServiceImpl(
     private val emailService: EmailService,
     private val refreshTokenRepository: RefreshTokenRepository,
 
-) : UserService {
+    ) : UserService {
 
     override fun login(
         request: LoginRequest,
@@ -51,6 +50,10 @@ class UserServiceImpl(
 
         val user = userRepository.findByEmail(request.email)
             ?: throw IllegalArgumentException("이메일 또는 비밀번호를 확인해주세요.")
+
+        if (user.status == Status.WITHDRAWAL) {
+            throw IllegalArgumentException("해당 계정은 탈퇴 처리되었습니다.")
+        }
 
         if (!passwordEncoder.matches(request.password, user.password)) {
             throw IllegalArgumentException("이메일 또는 비밀번호를 확인해주세요.")
@@ -111,6 +114,7 @@ class UserServiceImpl(
         }
     }
 
+
     override fun updatePassword(
         userId: Long,
         request: UpdateUserPasswordRequest
@@ -136,13 +140,9 @@ class UserServiceImpl(
     }
 
 
-
-
     @Transactional
-    override fun signUp(
-        request: SignUpRequest
-    ): UserResponse {
-        if (slangFilterService.isCleanText(request.introduction,)) {
+    override fun signUp(request: SignUpRequest): UserResponse {
+        if (slangFilterService.isCleanText(request.introduction)) {
             throw IllegalArgumentException("욕설금지🤬🤬🤬")
         }
         if (userRepository.existsByEmail(request.email)) {
@@ -151,23 +151,44 @@ class UserServiceImpl(
         if (request.password != request.confirmpassword) {
             throw IllegalArgumentException("비밀번호와 확인 비밀번호가 일치하지 않습니다.")
         }
-        var uploadedImageStrings: MutableList<String>? = null
-        if (!request.isPicsEmpty()) {
-            uploadedImageStrings = s3Service.upload(request.profilePic!!, "profile").toMutableList()
+        // 프로필 사진 업로드 처리
+        val uploadedImageStrings = if (request.profilePicUrl != null && request.profilePicUrl!!.isNotEmpty()) {
+            s3Service.upload(request.profilePicUrl!!, "profile").toMutableList()
+        } else {
+            mutableListOf("https://imgur.com/S8jQ6wN")
         }
+        // 비밀번호 해싱
         val hashedPassword = passwordEncoder.encode(request.password)
-        val user = userRepository.save(request.to().apply {
-            password = hashedPassword
-            if (uploadedImageStrings != null) {
-                profilePicUrl = uploadedImageStrings
-            }
-        })
+        // 사용자 정보 생성
+        val user = User(
+            role = Role.USER,
+            name = request.name,
+            email = request.email,
+            password = hashedPassword,
+            introduction = request.introduction,
+            tlno = request.tlno,
+            status = Status.NORMAL
+        )
+        user.profilePicUrl = uploadedImageStrings
+        // 사용자 정보 저장
+        val savedUser = userRepository.save(user)
+        // 이메일 인증 코드 생성 및 전송
         val verificationCode = UUID.randomUUID().toString().substring(0, 6)
-        user.verificationCode = verificationCode
-        userRepository.save(user)
-        emailService.sendVerificationEmail(user.email, verificationCode)
+        savedUser.verificationCode = verificationCode
+        userRepository.save(savedUser)
+        emailService.sendVerificationEmail(savedUser.email, verificationCode)
+        return UserResponse.from(savedUser)
+    }
+
+    override fun getUserProfile(userId: Long): UserResponse {
+        val authenticatedId: Long = (SecurityContextHolder.getContext().authentication.principal as UserPrincipal).id
+        if (userId != authenticatedId) {
+            throw IllegalArgumentException("프로필 조회 권한이 없습니다.")
+        }
+        val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException("해당 사용자를 찾을 수 없습니다.") }
         return UserResponse.from(user)
     }
+
 
     @Transactional
     override fun updateUserProfile(
@@ -191,9 +212,6 @@ class UserServiceImpl(
         }
         return UserResponse.from(user)
     }
-
-
-
 
 
 }
