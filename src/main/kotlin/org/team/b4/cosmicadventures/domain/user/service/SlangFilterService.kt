@@ -12,12 +12,12 @@ import org.springframework.web.reactive.function.client.WebClient
 
 @Service
 class SlangFilterService(
-    private val webClient: WebClient
+    private val webClient: WebClient,
+    @Value("\${openai.api.key}")  private var openaiApiKey: String
 ) {
     private val logger = LoggerFactory.getLogger(SlangFilterService::class.java)
 
     fun isCleanText(userInput: String): Boolean {
-        val openaiApiKey = "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"
         val apiUrl = "https://api.openai.com/v1/chat/completions"
         val requestBody = mapOf(
             "model" to "gpt-3.5-turbo",

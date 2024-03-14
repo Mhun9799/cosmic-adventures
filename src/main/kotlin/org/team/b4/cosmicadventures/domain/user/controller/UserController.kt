@@ -29,6 +29,20 @@ class UserController(
     private val userService: UserServiceImpl
 ) {
 
+    @Operation(summary = "회원가입")
+    @PostMapping("/signup",
+        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE],
+        produces = [MediaType.APPLICATION_JSON_VALUE]
+    )
+    fun signUp(
+        @Valid
+        @ModelAttribute signUpRequest: SignUpRequest): ResponseEntity<UserResponse> {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(userService.signUp(signUpRequest))
+    }
+
+
     @Operation(summary = "로그인")
     @PostMapping("/login")
     fun login(
@@ -53,23 +67,16 @@ class UserController(
     }
 
 
-    @Operation(summary = "회원가입")
-    @PostMapping("/signup",
-        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE],
-        produces = [MediaType.APPLICATION_JSON_VALUE]
-    )
-    fun signUp(
-        @Valid
-        @ModelAttribute signUpRequest: SignUpRequest): ResponseEntity<UserResponse> {
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(userService.signUp(signUpRequest))
+    @Operation(summary = "프로필 조회")
+    @GetMapping("/{userId}/profile")
+    fun getUserProfile(@PathVariable userId: Long):ResponseEntity<UserResponse>{
+        val userProfile = userService.getUserProfile(userId)
+        return ResponseEntity.ok(userProfile)
     }
-
 
     @Operation(summary = "프로필 수정")
     @PreAuthorize("hasRole('USER')")
-    @PutMapping("/{userId}/profile",
+    @PutMapping("/{userId}/profile-edit",
         consumes = [MediaType.MULTIPART_FORM_DATA_VALUE],
         produces = [MediaType.APPLICATION_JSON_VALUE])
     fun updateUserProfile(
