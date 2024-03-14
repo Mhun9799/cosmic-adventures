@@ -1,7 +1,6 @@
 package org.team.b4.cosmicadventures.domain.oauth2.client.oauth2
 
 import jakarta.transaction.NotSupportedException
-import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import org.team.b4.cosmicadventures.domain.oauth2.domain.entity.OAuth2Provider
 

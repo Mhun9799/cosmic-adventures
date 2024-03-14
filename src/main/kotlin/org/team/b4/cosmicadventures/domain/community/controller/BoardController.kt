@@ -22,11 +22,16 @@ import java.net.URI
 class BoardController(
     private val boardService: BoardService
 ) {
-    @Operation(summary = "게시글 목록 조회")
+    @Operation(summary = "게시글 목록 조회 작성일 기준")
     @GetMapping
-    fun getListBoard(
+    fun getListBoardByCreateAT(
     ): ResponseEntity<List<BoardDto>> =
-        ResponseEntity.ok().body(boardService.getListBoard())
+        ResponseEntity.ok().body(boardService.getListBoardByCreateAtASc())
+    @Operation(summary = "게시글 목록 조회 좋아요 순")
+    @GetMapping("/like")
+    fun getListBoardByLikeUp(
+    ): ResponseEntity<List<BoardDto>> =
+        ResponseEntity.ok().body(boardService.getListBoardByLikeUp())
 
     @Operation(summary = "게시글 단건조회")
     @GetMapping("/{boardId}")
@@ -44,7 +49,7 @@ class BoardController(
         ResponseEntity.created(URI.create("/")).body(boardService.createBoard(boardRequest, userPrincipal))
 
     @Operation(summary = "게시글 수정")
-    @PutMapping("{boardId}")
+    @PutMapping("/{boardId}")
     fun updateBoard(
         @PathVariable boardId: Long,
         @RequestBody boardRequest: BoardRequest,

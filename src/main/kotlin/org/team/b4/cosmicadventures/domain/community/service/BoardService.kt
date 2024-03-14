@@ -15,9 +15,11 @@ interface BoardService {
     // 게시글 삭제
     fun deleteBoard(boardId: Long, userPrincipal: UserPrincipal): String
 
-    //게시글 목록조회
-    fun getListBoard(): List<BoardDto>
+    //게시글 목록조회 작성일 기준
+    fun getListBoardByCreateAtASc(): List<BoardDto>
 
+    //게시글 좋아요순 목록조회
+    fun getListBoardByLikeUp(): List<BoardDto>
     //게시글 단건조회
     fun getBoard(boardId: Long): BoardDto
 

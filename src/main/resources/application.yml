@@ -12,6 +12,18 @@ spring:
             trust: smtp.naver.com
           starttls: true
   # DB Settings
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:~/space
+    username: hyeonseok
+    password:
+  #  datasource:
+  cache:
+    type: redis
   data:
     redis:
       host: localhost  # Redis 호스트 주소
