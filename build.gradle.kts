@@ -62,8 +62,8 @@ dependencies {
 	//REFLECTION
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	//DB
-	runtimeOnly("com.h2database:h2")
-//	runtimeOnly("org.postgresql:postgresql")
+//	runtimeOnly("com.h2database:h2")
+	runtimeOnly("org.postgresql:postgresql")
 	//SECURITY
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("io.jsonwebtoken:jjwt-api:0.12.3")

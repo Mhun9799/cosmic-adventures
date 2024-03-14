@@ -49,7 +49,6 @@ class UserServiceImpl(
         response: HttpServletResponse
     ): LoginResponse {
 
-
         val user = userRepository.findByEmail(request.email)
             ?: throw IllegalArgumentException("이메일 또는 비밀번호를 확인해주세요.")
 
@@ -60,19 +59,23 @@ class UserServiceImpl(
             throw IllegalArgumentException("이메일 인증 코드가 일치하지 않습니다.")
         }
         // 엑세스 토큰 생성
-        val accessToken = jwtPlugin.generateAccessToken(
-            subject = user.id.toString(),
-            email = user.email,
-            role = user.role.name
-        )
-        jwtPlugin.removeTokenFromBlacklist(accessToken)
+        val accessToken = user.role?.let {
+            jwtPlugin.generateAccessToken(
+                subject = user.id.toString(),
+                email = user.email,
+                role = it.name
+            )
+        }
+        accessToken?.let { jwtPlugin.removeTokenFromBlacklist(it) }
         // 리프레시 토큰 생성 및 DB에 저장
-        val refreshToken = jwtPlugin.generateRefreshToken(
-            subject = user.id.toString(),
-            email = user.email,
-            role = user.role.name
-        )
-        refreshTokenRepository.save(RefreshToken(user = user, token = refreshToken))
+        val refreshToken = user.role?.let {
+            jwtPlugin.generateRefreshToken(
+                subject = user.id.toString(),
+                email = user.email,
+                role = it.name
+            )
+        }
+        refreshTokenRepository.save(RefreshToken(user = user, token = refreshToken.toString()))
         // 쿠키에 엑세스 토큰 추가
         val accessTokenCookie = Cookie("access_token", accessToken)
         accessTokenCookie.path = "/"
@@ -83,12 +86,29 @@ class UserServiceImpl(
             name = user.name,
         )
     }
+
     override fun logout(response: HttpServletResponse, request: HttpServletRequest) {
         val accessToken = jwtPlugin.extractAccessTokenFromRequest(request)
         // 쿠키에서 엑세스 토큰 삭제
         jwtPlugin.deleteAccessTokenCookie(response)
         // 블랙리스트에 엑세스 토큰 추가
         jwtPlugin.invalidateToken(accessToken)
+    }
+
+    override fun withdrawal(userId: Long) {
+        val principal = SecurityContextHolder.getContext().authentication.principal
+        if (principal is UserPrincipal) {
+            val authenticatedId: Long = principal.id
+            if (userId != authenticatedId) {
+                throw IllegalArgumentException("탈퇴 권한이 없습니다.")
+            }
+            val user = userRepository.findById(userId)
+                .orElseThrow { throw IllegalArgumentException("해당 회원을 찾을 수 없습니다.") }
+            user.status = Status.WITHDRAWAL
+            userRepository.save(user)
+        } else {
+            throw IllegalStateException("로그인을 해주세요.")
+        }
     }
 
     override fun updatePassword(
@@ -122,38 +142,30 @@ class UserServiceImpl(
     override fun signUp(
         request: SignUpRequest
     ): UserResponse {
-
         if (slangFilterService.isCleanText(request.introduction,)) {
             throw IllegalArgumentException("욕설금지🤬🤬🤬")
         }
-
         if (userRepository.existsByEmail(request.email)) {
             throw IllegalStateException("이메일이 이미 사용중입니다.")
         }
-
         if (request.password != request.confirmpassword) {
             throw IllegalArgumentException("비밀번호와 확인 비밀번호가 일치하지 않습니다.")
         }
-
         var uploadedImageStrings: MutableList<String>? = null
         if (!request.isPicsEmpty()) {
             uploadedImageStrings = s3Service.upload(request.profilePic!!, "profile").toMutableList()
         }
-
         val hashedPassword = passwordEncoder.encode(request.password)
         val user = userRepository.save(request.to().apply {
             password = hashedPassword
             if (uploadedImageStrings != null) {
                 profilePicUrl = uploadedImageStrings
             }
-
         })
-
         val verificationCode = UUID.randomUUID().toString().substring(0, 6)
         user.verificationCode = verificationCode
         userRepository.save(user)
         emailService.sendVerificationEmail(user.email, verificationCode)
-
         return UserResponse.from(user)
     }
 
@@ -179,6 +191,7 @@ class UserServiceImpl(
         }
         return UserResponse.from(user)
     }
+
 
 
 
