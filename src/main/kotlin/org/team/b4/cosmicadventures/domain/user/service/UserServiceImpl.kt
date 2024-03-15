@@ -23,6 +23,7 @@ import org.team.b4.cosmicadventures.global.security.RefreshToken.repository.Refr
 import org.team.b4.cosmicadventures.domain.user.repository.UserRecentPasswordsRepository
 import org.team.b4.cosmicadventures.domain.user.repository.UserRepository
 import org.team.b4.cosmicadventures.domain.user.emailservice.EmailService
+import org.team.b4.cosmicadventures.domain.user.sms.SMSSender
 import org.team.b4.cosmicadventures.global.aws.S3Service
 import org.team.b4.cosmicadventures.global.exception.InvalidCredentialException
 import org.team.b4.cosmicadventures.global.security.UserPrincipal
@@ -40,6 +41,7 @@ class UserServiceImpl(
     private val s3Service: S3Service,
     private val emailService: EmailService,
     private val refreshTokenRepository: RefreshTokenRepository,
+    private val smsSender: SMSSender,
 
     ) : UserService {
 
@@ -47,14 +49,11 @@ class UserServiceImpl(
         request: LoginRequest,
         response: HttpServletResponse
     ): LoginResponse {
-
         val user = userRepository.findByEmail(request.email)
             ?: throw IllegalArgumentException("이메일 또는 비밀번호를 확인해주세요.")
-
         if (user.status == Status.WITHDRAWAL) {
             throw IllegalArgumentException("해당 계정은 탈퇴 처리되었습니다.")
         }
-
         if (!passwordEncoder.matches(request.password, user.password)) {
             throw IllegalArgumentException("이메일 또는 비밀번호를 확인해주세요.")
         }
@@ -91,6 +90,8 @@ class UserServiceImpl(
     }
 
     override fun logout(response: HttpServletResponse, request: HttpServletRequest) {
+
+
         val accessToken = jwtPlugin.extractAccessTokenFromRequest(request)
         // 쿠키에서 엑세스 토큰 삭제
         jwtPlugin.deleteAccessTokenCookie(response)
@@ -100,43 +101,38 @@ class UserServiceImpl(
 
     override fun withdrawal(userId: Long) {
         val principal = SecurityContextHolder.getContext().authentication.principal
-        if (principal is UserPrincipal) {
-            val authenticatedId: Long = principal.id
-            if (userId != authenticatedId) {
-                throw IllegalArgumentException("탈퇴 권한이 없습니다.")
-            }
-            val user = userRepository.findById(userId)
-                .orElseThrow { throw IllegalArgumentException("해당 회원을 찾을 수 없습니다.") }
-            user.status = Status.WITHDRAWAL
-            userRepository.save(user)
-        } else {
-            throw IllegalStateException("로그인을 해주세요.")
+        val authenticatedId = (principal as? UserPrincipal)?.id
+            ?: throw IllegalStateException("로그인을 해주세요.")
+        if (userId != authenticatedId) {
+            throw IllegalArgumentException("탈퇴 권한이 없습니다.")
         }
+        val user = userRepository.findById(userId)
+            .orElseThrow { IllegalArgumentException("해당 회원을 찾을 수 없습니다.") }
+        user.status = Status.WITHDRAWAL
+        userRepository.save(user)
     }
 
 
-    override fun updatePassword(
-        userId: Long,
-        request: UpdateUserPasswordRequest
-    ): String {
+    @Transactional
+    override fun updatePassword(request: UpdateUserPasswordRequest) {
+        val authentication = SecurityContextHolder.getContext().authentication
+        val userId = (authentication?.principal as? UserPrincipal)?.id
+            ?: throw IllegalStateException("로그인 부터 ")
         // 기존 비밀번호 확인
-        val user = userRepository.findById(userId).orElseThrow { ModelNotFoundException("user", userId) }
+        val user = userRepository.findById(userId)
+            .orElseThrow { ModelNotFoundException("user", userId) }
         if (!passwordEncoder.matches(request.userPassword, user.password)) {
             throw InvalidCredentialException("기존 비밀번호가 일치하지 않습니다.")
         }
-        val newPassword = request.userNewPassword
-        val newPasswordHash = passwordEncoder.encode(newPassword)
+        val newPasswordHash = passwordEncoder.encode(request.userNewPassword)
         val recentPasswords = userRecentPasswordsRepository.findTop3ByUserOrderByIdDesc(user)
-        if (recentPasswords.any { passwordEncoder.matches(newPassword, it.password) }) {
+        if (recentPasswords.any { passwordEncoder.matches(request.userNewPassword, it.password) }) {
             throw IllegalArgumentException("최근 3번 사용한 비밀번호는 사용할 수 없습니다.")
         }
         val recentPassword = UserRecentPasswords(newPasswordHash, user)
         userRecentPasswordsRepository.save(recentPassword)
-        // 현재 사용자 엔티티에 새로운 비밀번호 설정 및 저장
         user.password = newPasswordHash
         userRepository.save(user)
-
-        return "비밀번호 변경이 완료되었습니다."
     }
 
 
@@ -181,10 +177,10 @@ class UserServiceImpl(
     }
 
     override fun getUserProfile(userId: Long): UserResponse {
-        val authenticatedId: Long = (SecurityContextHolder.getContext().authentication.principal as UserPrincipal).id
+        val authenticatedId: Long = (SecurityContextHolder.getContext().authentication.principal as? UserPrincipal)?.id
+            ?: throw IllegalStateException("로그인을 부터")
         if (userId != authenticatedId) {
-            throw IllegalArgumentException("프로필 조회 권한이 없습니다.")
-        }
+            throw IllegalArgumentException("프로필 조회 권한이 없습니다.") }
         val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException("해당 사용자를 찾을 수 없습니다.") }
         return UserResponse.from(user)
     }
@@ -195,13 +191,14 @@ class UserServiceImpl(
         userId: Long,
         request: UpdateUserProfileRequest
     ): UserResponse {
-        val authenticatedId: Long = (SecurityContextHolder.getContext().authentication.principal as UserPrincipal).id
+        val authenticatedId: Long = (SecurityContextHolder.getContext().authentication.principal as? UserPrincipal)?.id
+            ?: throw IllegalStateException("로그인을 부터")
         if (userId != authenticatedId) {
-            throw IllegalArgumentException("프로필 수정 권한이 없습니다.")
-        }
-        var uploadedImageStrings: MutableList<String>? = null
-        if (!request.isPicsEmpty()) {
-            uploadedImageStrings = s3Service.upload(request.profilePic, "user").toMutableList()
+            throw IllegalArgumentException("프로필 수정 권한이 없습니다.") }
+        val uploadedImageStrings = if (request.profilePicUrl != null && request.profilePicUrl!!.isNotEmpty()) {
+            s3Service.upload(request.profilePicUrl!!, "profile").toMutableList()
+        } else {
+            mutableListOf("https://imgur.com/S8jQ6wN")
         }
         val user = userRepository.findByIdOrNull(userId) ?: throw ModelNotFoundException("User", userId)
         user.name = request.name
@@ -213,7 +210,46 @@ class UserServiceImpl(
         return UserResponse.from(user)
     }
 
+    override fun sendPasswordResetCode(email: String, phoneNumber: String): Boolean {
+        val user = userRepository.findByEmailAndTlno(email, phoneNumber)
+            ?: throw IllegalArgumentException("이메일 혹은 핸드폰번호가 일치하지 않습니다.")
+        val passwordCode = UUID.randomUUID().toString().substring(0, 6)
+        val internationalPhoneNumber = "82" + phoneNumber.replace("-", "")
+        val message = "인증코드🗝️ $passwordCode"
+        smsSender.sendSMS(internationalPhoneNumber, message)
+        userRepository.save(user.apply { this.passwordCode = passwordCode })
+        return true
+    }
 
+    override fun temporaryPassword(email: String, phoneNumber: String, code: String): String {
+        val user = userRepository.findByEmailAndTlno(email, phoneNumber)
+            ?: throw IllegalArgumentException("유효하지 않은 인증 코드입니다.")
+        if (user.passwordCode != code) {
+            throw IllegalArgumentException("유효하지 않은 인증 코드입니다.")
+        }
+        val passwordLength = 10
+        val specials = "!@#$%^&*("
+        val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+        val specialChar = specials.random()
+        val lowerChar = chars.filter { it.isLowerCase() }.random()
+        val upperChar = chars.filter { it.isUpperCase() }.random()
+        val digitChar = chars.filter { it.isDigit() }.random()
+        val passwordChars = buildString {
+            append(specialChar)
+            append(lowerChar)
+            append(upperChar)
+            append(digitChar)
+            repeat(passwordLength - 4) {
+                append(chars.random())
+            }
+        }
+        val savedUser = userRepository.save(user.apply {
+            verificationCode = UUID.randomUUID().toString().substring(0, 6)
+            password = passwordEncoder.encode(passwordChars)
+        })
+        savedUser.verificationCode?.let { emailService.sendVerificationEmail(savedUser.email, it, passwordChars) }
+        return passwordChars
+    }
 }
 
 
