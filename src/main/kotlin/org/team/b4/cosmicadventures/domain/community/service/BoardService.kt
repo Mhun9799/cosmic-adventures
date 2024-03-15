@@ -2,7 +2,9 @@ package org.team.b4.cosmicadventures.domain.community.service
 
 import org.springframework.web.multipart.MultipartFile
 import org.team.b4.cosmicadventures.domain.community.dto.BoardDto
+import org.team.b4.cosmicadventures.domain.community.dto.BoardLikeDto
 import org.team.b4.cosmicadventures.domain.community.dto.BoardRequest
+import org.team.b4.cosmicadventures.domain.community.dto.BoardRetrieveDto
 import org.team.b4.cosmicadventures.global.security.UserPrincipal
 
 interface BoardService {
@@ -26,6 +28,9 @@ interface BoardService {
     fun getBoard(boardId: Long): BoardDto
 
     // 게시글 좋아요
-    fun likeUpBoard(boardId: Long): BoardDto
+    fun likeUpBoard(boardId: Long, user: UserPrincipal): BoardRetrieveDto
+
+    // 좋아요 누른 사용자 목록조회
+    fun getLikeUser(boardId: Long, user: UserPrincipal): List<BoardLikeDto>
 
 }

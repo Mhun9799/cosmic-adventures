@@ -1,4 +1,4 @@
-package org.team.b4.cosmicadventures.domain.community.repository
+package org.team.b4.cosmicadventures.domain.community.repository.board
 
 import org.springframework.stereotype.Repository
 import org.team.b4.cosmicadventures.domain.community.model.Board

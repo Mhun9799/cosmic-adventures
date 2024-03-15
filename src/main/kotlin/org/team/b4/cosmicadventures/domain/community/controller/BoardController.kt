@@ -7,8 +7,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.team.b4.cosmicadventures.domain.community.dto.BoardDto
+import org.team.b4.cosmicadventures.domain.community.dto.BoardLikeDto
 import org.team.b4.cosmicadventures.domain.community.dto.BoardRequest
+import org.team.b4.cosmicadventures.domain.community.dto.BoardRetrieveDto
 import org.team.b4.cosmicadventures.domain.community.service.BoardService
+import org.team.b4.cosmicadventures.domain.user.model.QUser.user
 import org.team.b4.cosmicadventures.global.security.UserPrincipal
 import java.net.URI
 
@@ -70,8 +73,19 @@ class BoardController(
     @Operation(summary = "게시글 좋아요")
     @PostMapping("/{boardId}")
     fun likeUpBoard(
-        @PathVariable boardId: Long
-    ): ResponseEntity<BoardDto> {
-        return ResponseEntity.ok().body(boardService.likeUpBoard(boardId))
+        @PathVariable boardId: Long,
+        @AuthenticationPrincipal user: UserPrincipal
+    ): ResponseEntity<BoardRetrieveDto> {
+        return ResponseEntity.ok().body(boardService.likeUpBoard(boardId, user))
+    }
+
+    @Operation(summary = "게시글 좋아요한 사용자 목록")
+    @GetMapping("/{boardId}/like-users")
+    fun getLikeUser(
+        @PathVariable boardId: Long,
+        @AuthenticationPrincipal user: UserPrincipal
+    ): ResponseEntity<List<BoardLikeDto>> {
+        return ResponseEntity.ok().body(boardService.getLikeUser(boardId, user))
+
     }
 }
