@@ -1,16 +1,11 @@
 package org.team.b4.cosmicadventures.domain.community.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import org.team.b4.cosmicadventures.domain.community.dto.BoardDto
 import org.team.b4.cosmicadventures.domain.community.dto.BoardRequest
 import org.team.b4.cosmicadventures.domain.community.service.BoardService
@@ -22,11 +17,16 @@ import java.net.URI
 class BoardController(
     private val boardService: BoardService
 ) {
-    @Operation(summary = "게시글 목록 조회")
+    @Operation(summary = "게시글 목록 조회 작성일 기준")
     @GetMapping
-    fun getListBoard(
+    fun getListBoardByCreateAT(
     ): ResponseEntity<List<BoardDto>> =
-        ResponseEntity.ok().body(boardService.getListBoard())
+        ResponseEntity.ok().body(boardService.getListBoardByCreateAtASc())
+    @Operation(summary = "게시글 목록 조회 좋아요 순")
+    @GetMapping("/like")
+    fun getListBoardByLikeUp(
+    ): ResponseEntity<List<BoardDto>> =
+        ResponseEntity.ok().body(boardService.getListBoardByLikeUp())
 
     @Operation(summary = "게시글 단건조회")
     @GetMapping("/{boardId}")
@@ -36,18 +36,25 @@ class BoardController(
         ResponseEntity.ok().body(boardService.getBoard(boardId))
 
     @Operation(summary = "게시글 작성")
-    @PostMapping
+    @PostMapping(
+        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE],
+        produces = [MediaType.APPLICATION_JSON_VALUE]
+    )
     fun createBoard(
-        @RequestBody boardRequest: BoardRequest,
+        @ModelAttribute boardRequest: BoardRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<BoardDto> =
         ResponseEntity.created(URI.create("/")).body(boardService.createBoard(boardRequest, userPrincipal))
 
     @Operation(summary = "게시글 수정")
-    @PutMapping("{boardId}")
+    @PutMapping(
+        "/{boardId}",
+        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE],
+        produces = [MediaType.APPLICATION_JSON_VALUE]
+    )
     fun updateBoard(
         @PathVariable boardId: Long,
-        @RequestBody boardRequest: BoardRequest,
+        @ModelAttribute boardRequest: BoardRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<BoardDto> =
         ResponseEntity.ok().body(boardService.updateBoard(boardId, boardRequest, userPrincipal))

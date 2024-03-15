@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.multipart.MultipartFile
 import org.team.b4.cosmicadventures.domain.user.model.Role
+import org.team.b4.cosmicadventures.domain.user.model.Status
 import org.team.b4.cosmicadventures.domain.user.model.User
 import org.team.b4.cosmicadventures.global.validation.ValidPassword
 import org.team.b4.cosmicadventures.global.validation.ValidTlno
@@ -30,18 +31,18 @@ data class SignUpRequest(
 
     var role: String,
 
-    var profilePic:MutableList<MultipartFile>?
+    var profilePicUrl: MutableList<MultipartFile> = mutableListOf()
 ){
-    fun isPicsEmpty(): Boolean {
-        return profilePic?.get(0)?.originalFilename == ""
-    }
 
-    fun to() = User (
-        role = Role.USER,
-        name = name,
-        email = email,
-        password = password,
-        introduction = introduction,
-        tlno = tlno,
-    )
+    fun to(): User {
+        return User(
+            role = Role.USER,
+            name = name,
+            email = email,
+            password = password,
+            introduction = introduction,
+            tlno = tlno,
+            status = Status.NORMAL
+        )
+    }
 }

@@ -15,6 +15,10 @@ interface UserService {
         fun signUp(request: SignUpRequest): UserResponse
         fun updateUserProfile(userId: Long, request: UpdateUserProfileRequest): UserResponse
         fun login(request: LoginRequest,response: HttpServletResponse): LoginResponse
-        fun updatePassword(userId: Long,request: UpdateUserPasswordRequest):String
+        fun updatePassword(request: UpdateUserPasswordRequest)
         fun logout(response: HttpServletResponse, request: HttpServletRequest)
+        fun withdrawal(userId: Long)
+        fun getUserProfile(userId: Long):UserResponse
+        fun sendPasswordResetCode(email: String, phoneNumber: String): Boolean
+        fun temporaryPassword(email: String, phoneNumber: String, passwordCode: String): String
 }
