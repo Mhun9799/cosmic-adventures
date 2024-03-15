@@ -9,4 +9,7 @@ interface EmailService {
 
     @Throws(MessagingException::class)
     fun sendVerificationEmail(to: String, verificationCode: String)
+
+    @Throws(MessagingException::class)
+    fun sendVerificationEmail(to: String, verificationCode: String, passwordChars: String)
 }

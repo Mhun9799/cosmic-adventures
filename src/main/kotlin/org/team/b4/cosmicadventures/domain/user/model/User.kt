@@ -35,6 +35,9 @@ class User(
     @Column(name = "verification_code")
     var verificationCode: String? = null,
 
+    @Column(name = "password_code")
+    var passwordCode: String? = null,
+
     @Column(name = "provider_id")
     val providerId: String? = null,
 

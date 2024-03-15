@@ -11,10 +11,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
-import org.team.b4.cosmicadventures.domain.user.dto.request.LoginRequest
-import org.team.b4.cosmicadventures.domain.user.dto.request.SignUpRequest
-import org.team.b4.cosmicadventures.domain.user.dto.request.UpdateUserPasswordRequest
-import org.team.b4.cosmicadventures.domain.user.dto.request.UpdateUserProfileRequest
+import org.team.b4.cosmicadventures.domain.user.dto.request.*
 import org.team.b4.cosmicadventures.domain.user.dto.response.LoginResponse
 import org.team.b4.cosmicadventures.domain.user.dto.response.UserResponse
 import org.team.b4.cosmicadventures.domain.user.service.UserServiceImpl
@@ -75,7 +72,6 @@ class UserController(
     }
 
     @Operation(summary = "프로필 수정")
-    @PreAuthorize("hasRole('USER')")
     @PutMapping("/{userId}/profile-edit",
         consumes = [MediaType.MULTIPART_FORM_DATA_VALUE],
         produces = [MediaType.APPLICATION_JSON_VALUE])
@@ -90,17 +86,15 @@ class UserController(
     }
 
     @Operation(summary = "비밀번호 수정")
-    @PreAuthorize("hasRole('USER')")
-    @PutMapping("/my-password",
-        )
+    @PutMapping("/my-password")
     fun updatePassword(
         @Valid
-        @RequestBody request:UpdateUserPasswordRequest): ResponseEntity<String>{
-        val authenticatedId = (SecurityContextHolder.getContext().authentication.principal as UserPrincipal).id
-        val message = userService.updatePassword(authenticatedId,request)
+        @RequestBody request: UpdateUserPasswordRequest
+    ): ResponseEntity<String> {
+        userService.updatePassword(request)
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(message)
+            .body("비밀번호 수정 완료되었습니다.")
     }
 
 
@@ -118,6 +112,27 @@ class UserController(
     @DeleteMapping("/withdrawal/{userId}")
     fun withdrawal(@PathVariable userId: Long): ResponseEntity<String> {
         userService.withdrawal(userId)
-        return ResponseEntity.ok("회원 탈퇴가 성공적으로 처리되었습니다.")
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body("회원 탈퇴가 성공적으로 처리되었습니다.")
+    }
+
+
+    @Operation(summary = "비밀번호찾기인증코드")
+    @PostMapping("/send-password-code")
+    fun resetPassword(@RequestBody request: PasswordResetRequest): ResponseEntity<String> {
+        userService.sendPasswordResetCode(request.email, request.phoneNumber)
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body("핸드폰번호로 문자가 전송되었습니다.")
+    }
+
+    @Operation(summary = "인증코드로임시비밀번호")
+    @PostMapping("/temporary-password")
+    fun temporaryPassword(@RequestBody request: TemporaryPasswordRequest): ResponseEntity<String> {
+        userService.temporaryPassword(request.email, request.phoneNumber, request.code)
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body("이메일로 임시비밀번로가 전송되었습니다.")
     }
 }
