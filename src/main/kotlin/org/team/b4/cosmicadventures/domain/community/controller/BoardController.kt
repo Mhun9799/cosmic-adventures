@@ -86,6 +86,5 @@ class BoardController(
         @AuthenticationPrincipal user: UserPrincipal
     ): ResponseEntity<List<BoardLikeDto>> {
         return ResponseEntity.ok().body(boardService.getLikeUser(boardId, user))
-
     }
 }
