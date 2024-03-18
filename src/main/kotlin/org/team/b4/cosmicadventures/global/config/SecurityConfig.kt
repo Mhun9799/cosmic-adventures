@@ -41,7 +41,7 @@ class SecurityConfig(
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
                     "/api/v1/users/**",
-
+                    "/**"
                     ).permitAll()
                     // 위 URI를 제외하곤 모두 인증이 되어야 함.
                     .anyRequest().authenticated()

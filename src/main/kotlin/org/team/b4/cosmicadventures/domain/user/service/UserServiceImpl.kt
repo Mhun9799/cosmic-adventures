@@ -22,8 +22,8 @@ import org.team.b4.cosmicadventures.domain.user.model.*
 import org.team.b4.cosmicadventures.global.security.RefreshToken.repository.RefreshTokenRepository
 import org.team.b4.cosmicadventures.domain.user.repository.UserRecentPasswordsRepository
 import org.team.b4.cosmicadventures.domain.user.repository.UserRepository
-import org.team.b4.cosmicadventures.domain.user.emailservice.EmailService
-import org.team.b4.cosmicadventures.domain.user.sms.SMSSender
+import org.team.b4.cosmicadventures.global.emailservice.EmailService
+import org.team.b4.cosmicadventures.global.sms.SMSSender
 import org.team.b4.cosmicadventures.global.aws.S3Service
 import org.team.b4.cosmicadventures.global.exception.InvalidCredentialException
 import org.team.b4.cosmicadventures.global.security.UserPrincipal
