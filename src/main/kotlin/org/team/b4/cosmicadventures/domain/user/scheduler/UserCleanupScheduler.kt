@@ -2,8 +2,8 @@ package org.team.b4.cosmicadventures.domain.user.scheduler
 
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import org.team.b4.cosmicadventures.domain.community.repository.BoardRepository
-import org.team.b4.cosmicadventures.domain.community.repository.CommentRepository
+import org.team.b4.cosmicadventures.domain.community.repository.board.BoardRepository
+import org.team.b4.cosmicadventures.domain.community.repository.comment.CommentRepository
 import org.team.b4.cosmicadventures.domain.user.model.Status
 import org.team.b4.cosmicadventures.domain.user.repository.UserRepository
 import java.time.LocalDate

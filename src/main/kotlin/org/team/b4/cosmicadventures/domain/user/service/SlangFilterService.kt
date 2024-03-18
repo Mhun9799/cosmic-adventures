@@ -13,7 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient
 @Service
 class SlangFilterService(
     private val webClient: WebClient,
-    @Value("\${openai.api.key}")  private var openaiApiKey: String
+    @Value("\${openai.api.key}") private var openaiApiKey: String
 ) {
     private val logger = LoggerFactory.getLogger(SlangFilterService::class.java)
 

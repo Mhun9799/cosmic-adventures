@@ -1,6 +1,7 @@
 package org.team.b4.cosmicadventures.domain.community.model
 
 
+import com.querydsl.core.types.dsl.Wildcard.count
 import jakarta.persistence.*
 import org.team.b4.cosmicadventures.domain.user.model.User
 import org.team.b4.cosmicadventures.global.StringMutableListConverter
@@ -35,5 +36,8 @@ class Board(
 
     fun likeUp() {
         likeCount += 1
+    }
+    fun likeDown() {
+        likeCount -= 1
     }
 }

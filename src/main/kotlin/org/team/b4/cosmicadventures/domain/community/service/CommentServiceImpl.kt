@@ -4,8 +4,8 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.team.b4.cosmicadventures.domain.community.dto.CommentDto
 import org.team.b4.cosmicadventures.domain.community.dto.CommentRequest
-import org.team.b4.cosmicadventures.domain.community.repository.BoardRepository
-import org.team.b4.cosmicadventures.domain.community.repository.CommentRepository
+import org.team.b4.cosmicadventures.domain.community.repository.board.BoardRepository
+import org.team.b4.cosmicadventures.domain.community.repository.comment.CommentRepository
 import org.team.b4.cosmicadventures.domain.user.repository.UserRepository
 import org.team.b4.cosmicadventures.global.exception.ModelNotFoundException
 import org.team.b4.cosmicadventures.global.security.UserPrincipal
