@@ -13,7 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient
 @Service
 class SlangFilterService(
     private val webClient: WebClient,
-    @Value("\${openai.api.key}")  private var openaiApiKey: String
+    @Value("\${openai.api.key}") private var openaiApiKey: String
 ) {
     private val logger = LoggerFactory.getLogger(SlangFilterService::class.java)
 
@@ -24,7 +24,7 @@ class SlangFilterService(
             "messages" to listOf(
                 mapOf(
                     "role" to "system",
-                    "content" to "비속어가 있으면 무조건 false 비속어가 없으면 무조건 true 로 대답해"
+                    "content" to "비속어가 있으면 무조건 true 비속어가 없으면 무조건 false 로 대답해"
                 ),
                 mapOf("role" to "user", "content" to userInput)
             ),
@@ -42,17 +42,15 @@ class SlangFilterService(
                 .block()
             val statusCode = responseEntity?.statusCode
             logger.info("API Response Status Code: {}", statusCode)
-            // 여기서 상태 코드를 확인하고 필요한 작업을 수행합니다.
-            if (statusCode?.is2xxSuccessful == true) {
+            // 상태 코드 확인 및 처리
+            return if (statusCode?.is2xxSuccessful == true) {
                 val responseBody = responseEntity.body
                 logger.info("API Response Body: {}", responseBody)
-
-                // responseBody를 분석하여 contains_inappropriate_language가 true이면 false 반환
-                val containsInappropriateLanguage = extractContainsInappropriateLanguage(responseBody)
-                return !containsInappropriateLanguage
+                // responseBody에서 contains_inappropriate_language가 true이면 false 반환
+                extractContainsInappropriateLanguage(responseBody)
             } else {
-                // 상태 코드가 성공이 아닌 경우에 대한 처리
-                return false
+                // 상태 코드가 성공이 아닌 경우
+                false
             }
         } catch (ex: Exception) {
             logger.error("Exception during API call", ex)
@@ -60,30 +58,20 @@ class SlangFilterService(
         }
     }
 
-    fun extractContainsInappropriateLanguage(responseBody: String?): Boolean {
-
-        val json = ObjectMapper().readTree(responseBody)
+    private fun extractContainsInappropriateLanguage(responseBody: String?): Boolean {
+        val json = ObjectMapper().readTree(responseBody ?: "")
 
         // "choices" 배열에서 "content" 값을 가져오고 이 값을 기준으로 판단
         val contentNode = json.path("choices").firstOrNull()?.path("message")?.path("content")
-        if (contentNode != null && contentNode.isTextual) {
-            val contentText = contentNode.asText().toLowerCase()
-            return contentText == "true"
+        return if (contentNode != null && contentNode.isTextual) {
+            contentNode.asText().equals("true", ignoreCase = true)
         } else {
-            // "content" 필드가 없거나 부적절한 형식인 경우 처리
+            // "content" 필드가 없거나 부적절한 형식인 경우
             logger.error("Invalid or missing 'content' field in JSON response")
-            return false
-        }
-
-    }
-
-
-    @Configuration
-    class SlangFilterServiceConfig {
-        @Bean
-        fun webClient(): WebClient {
-            return WebClient.create()
+            false
         }
     }
+
 }
+
 

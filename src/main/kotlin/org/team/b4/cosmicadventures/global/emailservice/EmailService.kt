@@ -1,4 +1,4 @@
-package org.team.b4.cosmicadventures.domain.user.emailservice
+package org.team.b4.cosmicadventures.global.emailservice
 
 import jakarta.mail.MessagingException
 

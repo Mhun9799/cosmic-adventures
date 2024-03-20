@@ -1,9 +1,9 @@
-package org.team.b4.cosmicadventures.domain.user.scheduler
+package org.team.b4.cosmicadventures.global.scheduler
 
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import org.team.b4.cosmicadventures.domain.community.repository.BoardRepository
-import org.team.b4.cosmicadventures.domain.community.repository.CommentRepository
+import org.team.b4.cosmicadventures.domain.community.repository.board.BoardRepository
+import org.team.b4.cosmicadventures.domain.community.repository.comment.CommentRepository
 import org.team.b4.cosmicadventures.domain.user.model.Status
 import org.team.b4.cosmicadventures.domain.user.repository.UserRepository
 import java.time.LocalDate
@@ -19,8 +19,8 @@ class UserCleanupScheduler(
     @Scheduled(cron = "0 0 0 * * ?")
     fun cleanupWaitUsers() {
         val thresholdDate = LocalDate.now().minusDays(90)
-        val WITHDRAWALUsers = userRepository.findByStatus(Status.WITHDRAWAL)
-        WITHDRAWALUsers.forEach { user ->
+        val wITHDRAWALUsers = userRepository.findByStatus(Status.WITHDRAWAL)
+        wITHDRAWALUsers.forEach { user ->
             val createdAtDate = user.createdAt.toLocalDate()
             if (createdAtDate.isBefore(thresholdDate)) {
                 val userPosts = boardRepository.findByUser(user)
