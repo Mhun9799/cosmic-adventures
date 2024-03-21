@@ -19,6 +19,7 @@ import org.team.b4.cosmicadventures.global.security.UserPrincipal
 import org.team.b4.cosmicadventures.global.security.jwt.JwtPlugin
 
 
+
 @RestController
 @RequestMapping("/api/v1/users")
 class UserController(
