@@ -1,5 +1,6 @@
 package org.team.b4.cosmicadventures.domain.iss.controller
 
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -10,7 +11,9 @@ import org.team.b4.cosmicadventures.domain.iss.service.IssLocationService
 
 @RestController
 @RequestMapping("/api/v1/iss")
-class IssLocationController(private val issLocationService: IssLocationService) {
+class IssLocationController(
+    private val issLocationService: IssLocationService,
+) {
 
     //ISS위성의 위치
     @GetMapping("/location")
@@ -26,5 +29,10 @@ class IssLocationController(private val issLocationService: IssLocationService) 
     @GetMapping("/location-and-astronauts")
     fun getIssLocationAndAstronauts(): IssLocationAndAstronautsResponse {
         return issLocationService.getIssLocationAndAstronauts()
+    }
+
+    @GetMapping("/ip")
+    fun getClientIp(request: HttpServletRequest): String {
+        return issLocationService.getClientIp(request)
     }
 }
