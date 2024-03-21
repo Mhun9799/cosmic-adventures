@@ -24,12 +24,13 @@ data class SignUpRequest(
     @field: ValidPassword
     var confirmpassword:String,
 
+
     var introduction: String,
 
     @field: ValidTlno
     var tlno: String,
 
-    var role: String,
+    var role: Role,
 
     var profilePicUrl: MutableList<MultipartFile> = mutableListOf()
 ){

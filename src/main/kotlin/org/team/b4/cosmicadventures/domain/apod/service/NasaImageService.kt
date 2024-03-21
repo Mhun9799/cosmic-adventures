@@ -29,6 +29,7 @@ class NasaImageService(
         // 추출한 NasaImage 객체를 데이터베이스에 저장하고 저장된 객체를 반환
         return nasaImageRepository.save(nasaImage)
     }
+
     // NASA API 응답에서 NasaImage 객체를 추출하는 메서드
     private fun extractNasaImageFromApiResponse(apodResponse: String?): NasaImage {
         // Jackson ObjectMapper를 사용하여 JSON 형식의 API 응답을 파싱

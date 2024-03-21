@@ -2,6 +2,7 @@ package org.team.b4.cosmicadventures.domain.iss.service
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.team.b4.cosmicadventures.domain.iss.dto.AstronautResponse
@@ -55,6 +56,43 @@ class IssLocationService(
 
         return IssLocationAndAstronautsResponse(issLocation, astronauts)
     }
+
+    fun getClientIp(request: HttpServletRequest): String {
+        var ip: String? = request.getHeader("X-Forwarded-For")
+        if (ip.isNullOrEmpty() || "unknown".equals(ip, ignoreCase = true)) {
+            ip = request.getHeader("Proxy-Client-IP")
+        }
+        if (ip.isNullOrEmpty() || "unknown".equals(ip, ignoreCase = true)) {
+            ip = request.getHeader("WL-Proxy-Client-IP")
+        }
+        if (ip.isNullOrEmpty() || "unknown".equals(ip, ignoreCase = true)) {
+            ip = request.getHeader("HTTP_X_FORWARDED_FOR")
+        }
+        if (ip.isNullOrEmpty() || "unknown".equals(ip, ignoreCase = true)) {
+            ip = request.getHeader("HTTP_X_FORWARDED")
+        }
+        if (ip.isNullOrEmpty() || "unknown".equals(ip, ignoreCase = true)) {
+            ip = request.getHeader("HTTP_X_CLUSTER_CLIENT_IP")
+        }
+        if (ip.isNullOrEmpty() || "unknown".equals(ip, ignoreCase = true)) {
+            ip = request.getHeader("HTTP_CLIENT_IP")
+        }
+        if (ip.isNullOrEmpty() || "unknown".equals(ip, ignoreCase = true)) {
+            ip = request.getHeader("HTTP_FORWARDED_FOR")
+        }
+        if (ip.isNullOrEmpty() || "unknown".equals(ip, ignoreCase = true)) {
+            ip = request.getHeader("HTTP_FORWARDED")
+        }
+        if (ip.isNullOrEmpty() || "unknown".equals(ip, ignoreCase = true)) {
+            ip = request.getHeader("HTTP_VIA")
+        }
+        if (ip.isNullOrEmpty() || "unknown".equals(ip, ignoreCase = true)) {
+            ip = request.remoteAddr
+        }
+        return ip.orEmpty()
+    }
+
+
 }
 
 //

@@ -13,7 +13,7 @@ class NasaImage(
     @Column
     val title: String,
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     val explanation: String?,
 
     @Column

@@ -24,6 +24,7 @@ class MarsRoverService(
             .retrieve()
             .bodyToMono(String::class.java)
             .block()
+
         // API 응답을 객체로 매핑
         val objectMapper = ObjectMapper()
         val photosArray = objectMapper.readTree(response).get("latest_photos")
@@ -36,19 +37,16 @@ class MarsRoverService(
             val earthDate = selectedPhoto.get("earth_date").asText()
             val roverName = selectedPhoto.get("rover").get("name").asText()
             val cameraName = selectedPhoto.get("camera").get("name").asText()
-
             val marsRover = MarsRover(
                 imgSrc = imgSrc,
                 earthDate = earthDate,
                 roverName = roverName,
                 cameraName = cameraName)
             marsRoverRepository.save(marsRover)
-
             MarsRoverResponse(imgSrc, earthDate, roverName, cameraName)
         } else {
             null
         }
-
         return randomPhoto
     }
 }
