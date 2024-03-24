@@ -1,7 +1,7 @@
-package org.team.b4.cosmicadventures.domain.donki.service
+package org.team.b4.cosmicadventures.domain.news.service
 
 import com.fasterxml.jackson.databind.JsonNode
-import org.team.b4.cosmicadventures.domain.donki.model.News
+import org.team.b4.cosmicadventures.domain.news.model.News
 
 interface DonkiService {
     fun saveFromApi(apiUrl: String, extractor: (JsonNode) -> News)

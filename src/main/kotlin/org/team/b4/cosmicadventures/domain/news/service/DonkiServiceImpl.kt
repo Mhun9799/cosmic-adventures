@@ -1,20 +1,19 @@
-package org.team.b4.cosmicadventures.domain.donki.service
+package org.team.b4.cosmicadventures.domain.news.service
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
-import org.team.b4.cosmicadventures.domain.donki.dto.request.*
-import org.team.b4.cosmicadventures.domain.donki.model.News
-import org.team.b4.cosmicadventures.domain.donki.repository.DonkiRepository
+import org.team.b4.cosmicadventures.domain.news.dto.request.*
+import org.team.b4.cosmicadventures.domain.news.model.News
+import org.team.b4.cosmicadventures.domain.news.repository.NewsRepository
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Service
 class DonkiServiceImpl(
-    private val donkiRepository: DonkiRepository,
+    private val newsRepository: NewsRepository,
     private val objectMapper: ObjectMapper,
     private val webClientBuilder: WebClient.Builder
 ) : DonkiService {
@@ -40,6 +39,8 @@ class DonkiServiceImpl(
         saveFromApi("$BASE_URL/CME?startDate=$yesterday&endDate=$yesterday&api_key=$API_KEY", cmeResponseExtractor)
         saveFromApi("$BASE_URL/GST?startDate=$yesterday&endDate=$yesterday&api_key=$API_KEY", gstResponseExtractor)
         saveFromApi("$BASE_URL/RBE?startDate=$yesterday&endDate=$yesterday&api_key=$API_KEY", rbeResponseExtractor)
+        saveFromApi("$BASE_URL/FLR?startDate=$yesterday&endDate=$yesterday&api_key=$API_KEY", flrResponseExtractor)
+        saveFromApi("$BASE_URL/HSS?startDate=$yesterday&endDate=$yesterday&api_key=$API_KEY", hssResponseExtractor)
     }
 
     override fun saveFromApi(apiUrl: String, extractor: (JsonNode) -> News) {
@@ -51,10 +52,8 @@ class DonkiServiceImpl(
 
         if (!response.isNullOrEmpty()) {
             val nodeList = objectMapper.readTree(response)
-            val newsList = nodeList.mapNotNull { node ->
-                if (node["eventTime"].asText() != "null") extractor(node) else null
-            }
-            donkiRepository.saveAll(newsList) // EntityManager 사용
+            val newsList = nodeList.mapNotNull { node -> extractor(node) }
+            newsRepository.saveAll(newsList) // EntityManager 사용
         }
     }
 
@@ -68,8 +67,13 @@ class DonkiServiceImpl(
             link = node["link"].asText(),
         )
         News(
-            title = mpcDto.mpcID,
-            body = "관측시간은 ${mpcDto.eventTime}, 관련정보 링크는 ${mpcDto.link}입니다."
+            title = "Magnetopause Crossing",
+            body = "관측시간은 ${mpcDto.eventTime}, 관련정보 링크는 ${mpcDto.link}입니다.",
+            detail = """
+                ID = ${mpcDto.mpcID}
+                eventTime = ${mpcDto.eventTime}
+                link = ${mpcDto.link}
+            """.trimIndent()
         )
     }
 
@@ -83,8 +87,13 @@ class DonkiServiceImpl(
             link = node["link"].asText(),
         )
         News(
-            title = sepDto.sepID,
-            body = "관측시간은 ${sepDto.eventTime}, 관련정보 링크는 ${sepDto.link}입니다."
+            title = "Solar Energetic Particle",
+            body = "관측시간은 ${sepDto.eventTime}, 관련정보 링크는 ${sepDto.link}입니다.",
+            detail = """
+                ID = ${sepDto.sepID}
+                eventTime = ${sepDto.eventTime}
+                link = ${sepDto.link}
+            """.trimIndent()
         )
     }
 
@@ -100,8 +109,14 @@ class DonkiServiceImpl(
         )
 
         News(
-            title = cmeDto.cmeID,
-            body = "관측시간은 ${cmeDto.startTime}, 카탈로그는 ${cmeDto.catalog} 관련정보 링크는 ${cmeDto.link}입니다."
+            title = "Coronal Mass Ejection",
+            body = "관측시간은 ${cmeDto.startTime}, 카탈로그는 ${cmeDto.catalog} 관련정보 링크는 ${cmeDto.link}입니다.",
+            detail = """
+                ID = ${cmeDto.cmeID}
+                eventTime = ${cmeDto.startTime}
+                catalog = ${cmeDto.catalog}
+                link = ${cmeDto.link}
+            """.trimIndent()
         )
     }
 
@@ -116,8 +131,13 @@ class DonkiServiceImpl(
         )
 
         News(
-            title = gstDto.gstID,
-            body = "관측시간은 ${gstDto.startTime}, 관련정보 링크는 ${gstDto.link}입니다."
+            title = "Geomagnetic Storm",
+            body = "관측시간은 ${gstDto.startTime}, 관련정보 링크는 ${gstDto.link}입니다.",
+            detail = """
+                ID = ${gstDto.gstID}
+                eventTime = ${gstDto.startTime}
+                link = ${gstDto.link}
+            """.trimIndent()
         )
     }
 
@@ -131,52 +151,55 @@ class DonkiServiceImpl(
             link = node["link"].asText(),
         )
         News(
-            title = rbeDto.rbeID,
-            body = "관측시간은 ${rbeDto.eventTime}, 관련정보 링크는 ${rbeDto.link}입니다."
+            title = "Radiation Belt Enhancement",
+            body = "관측시간은 ${rbeDto.eventTime}, 관련정보 링크는 ${rbeDto.link}입니다.",
+            detail = """
+                ID = ${rbeDto.rbeID}
+                eventTime = ${rbeDto.eventTime}
+                link = ${rbeDto.link}
+            """.trimIndent()
+        )
+    }
+    val flrResponseExtractor: (JsonNode) -> News = { node ->
+        val beginTimeString = node["beginTime"].asText().replace("Z", "")
+        val beginTime = LocalDateTime.parse(beginTimeString)
+
+        val flrDto = FlrDto(
+            flrID = node["flrID"].asText(),
+            beginTime = beginTime,
+            link = node["link"].asText(),
+        )
+        News(
+            title = "Solar Flare",
+            body = "관측시간은 ${flrDto.beginTime}, 관련정보 링크는 ${flrDto.link}입니다.",
+            detail = """
+                ID = ${flrDto.flrID}
+                eventTime = ${flrDto.beginTime}
+                link = ${flrDto.link}
+            """.trimIndent()
+        )
+    }
+
+    val hssResponseExtractor: (JsonNode) -> News = { node ->
+        val eventTimeString = node["eventTime"].asText().replace("Z", "")
+        val eventTime = LocalDateTime.parse(eventTimeString)
+
+        val hssDto = HssDto(
+            hssID = node["hssID"].asText(),
+            eventTime = eventTime,
+            link = node["link"].asText(),
+        )
+        News(
+            title = "Hight Speed Stream",
+            body = "관측시간은 ${hssDto.eventTime}, 관련정보 링크는 ${hssDto.link}입니다.",
+            detail = """
+                ID = ${hssDto.hssID}
+                eventTime = ${hssDto.eventTime}
+                link = ${hssDto.link}
+            """.trimIndent()
         )
     }
 
 
 }
 
-
-//    private fun extractMpcFromApiResponse(mpcResponse: String?): List<Mpc> {
-//        val nodeList = objectMapper.readTree(mpcResponse)
-//        val mpcList = mutableListOf<Mpc>()
-//
-//        for (node in nodeList) {
-////            val instruments: List<Instrument>? = node["instruments"]?.let {
-////                objectMapper.readValue(it.toString(), List::class.java) as List<Instrument>
-////            }
-//
-////            val instruments: List<Instrument>
-////            if (node["instruments"].toString().equals("null")) {
-////                instruments = mutableListOf()
-////            } else {
-////                instruments = objectMapper.readValue(node["instruments"].toString(), List::class.java) as List<Instrument>
-////            }
-////
-////            var linkedEvents: List<LinkedEvent>
-////            if (node["linkedEvents"].toString().equals("null")) {
-////                linkedEvents = mutableListOf()
-////            } else {
-////                linkedEvents = objectMapper.readValue(node["linkedEvents"].toString(), List::class.java) as List<LinkedEvent>
-////            }
-//
-////
-//
-//            val eventTimeString = node["eventTime"].asText().replace("Z", "")
-//            val eventTime = LocalDateTime.parse(eventTimeString)
-//
-//            val mpc = Mpc(
-//                mpcID = node["mpcID"].asText(),
-//                eventTime = eventTime,
-//                link = node["link"].asText(),
-////                instruments = instruments,
-////                linkedEvents = linkedEvents,
-//            )
-//            mpcList.add(mpc)
-//        }
-//
-//        return mpcList
-//    }

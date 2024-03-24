@@ -1,4 +1,4 @@
-package org.team.b4.cosmicadventures.domain.donki.model
+package org.team.b4.cosmicadventures.domain.news.model
 
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -12,4 +12,5 @@ class News(
     val id: Long? = null,
     val title: String,
     val body: String,
+    val detail: String,
 )

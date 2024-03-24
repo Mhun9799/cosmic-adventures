@@ -1,4 +1,4 @@
-package org.team.b4.cosmicadventures.domain.donki.dto.request
+package org.team.b4.cosmicadventures.domain.news.dto.request
 
 import java.time.LocalDateTime
 
