@@ -13,4 +13,6 @@ interface UserRepository:JpaRepository<User, Long> {
     fun findByEmail(email:String):User?
     fun findByStatus(status: Status): List<User>
     fun findByEmailAndTlno(email: String, tlno: String): User?
+
+
 }
