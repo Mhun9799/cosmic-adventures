@@ -150,7 +150,7 @@ class UserServiceImpl(
         val uploadedImageStrings = if (request.profilePicUrl != null && request.profilePicUrl.isNotEmpty()) {
             s3Service.upload(request.profilePicUrl!!, "profile").toMutableList()
         } else {
-            mutableListOf("https://imgur.com/S8jQ6wN") // 기본 이미지 URL로 대체
+            mutableListOf("https://cdn.quasar.dev/img/boy-avatar.png") // 기본 이미지 URL로 대체
         }
         // 비밀번호 해싱
         val hashedPassword = passwordEncoder.encode(request.password)
