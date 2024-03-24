@@ -3,6 +3,7 @@ package org.team.b4.cosmicadventures.domain.community.service
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 import org.team.b4.cosmicadventures.domain.community.dto.BoardDto
 import org.team.b4.cosmicadventures.domain.community.dto.BoardLikeDto
 import org.team.b4.cosmicadventures.domain.community.dto.BoardRequest
@@ -41,10 +42,15 @@ class BoardServiceImpl(
     //게시글 작성
     override fun createBoard(
         boardRequest: BoardRequest,
-        userPrincipal: UserPrincipal
+        userPrincipal: UserPrincipal,
+        imageList: MutableList<MultipartFile>
     ): BoardDto {
         //S3 에서 이미지 url 받아옴
-        val image = s3Service.upload(boardRequest.image!!, "board").toMutableList()
+        val image = if (imageList.isNotEmpty()) {
+            s3Service.upload(boardRequest.image!!, "board").toMutableList()
+        } else {
+            emptyList<String>().toMutableList()
+        }
         val users =
             userRepository.findByIdOrNull(userPrincipal.id) ?: throw ModelNotFoundException("user", userPrincipal.id)
         val board = boardRepository.save(boardRequest.to(users, image))
@@ -52,11 +58,25 @@ class BoardServiceImpl(
     }
 
     //게시글 수정
-    override fun updateBoard(boardId: Long, boardRequest: BoardRequest, userPrincipal: UserPrincipal): BoardDto {
-        val image = s3Service.upload(boardRequest.image!!, "board").toMutableList()
-        val users = userRepository.findByIdOrNull(userPrincipal.id) ?: throw ModelNotFoundException("user", userPrincipal.id)
-        boardRepository.findByIdAndUserId(boardId, userPrincipal.id) ?: throw UserNotMatchedException()
-        return BoardDto.from(boardRepository.save(boardRequest.to(users, image)))
+    override fun updateBoard(
+        boardId: Long,
+        boardRequest: BoardRequest,
+        userPrincipal: UserPrincipal,
+        imageList: MutableList<MultipartFile>
+    ): BoardDto {
+        // 로그인 유저가 디비에 있는지
+        userRepository.findByIdOrNull(userPrincipal.id) ?: throw ModelNotFoundException("user", userPrincipal.id)
+        // 작성자가 맞는지
+        val board = boardRepository.findByIdAndUserId(boardId, userPrincipal.id) ?: throw UserNotMatchedException()
+        // 게시판 수정부분
+        board.changeBoard(boardRequest)
+        val image = if (imageList.isNotEmpty()) {
+            s3Service.upload(boardRequest.image!!, "board").toMutableList()
+        } else {
+            board.image
+        }
+        board.image = image
+        return BoardDto.from(boardRepository.save(board))
     }
 
     //게시글 삭제

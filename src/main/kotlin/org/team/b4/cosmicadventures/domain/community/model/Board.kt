@@ -3,6 +3,7 @@ package org.team.b4.cosmicadventures.domain.community.model
 
 import com.querydsl.core.types.dsl.Wildcard.count
 import jakarta.persistence.*
+import org.team.b4.cosmicadventures.domain.community.dto.BoardRequest
 import org.team.b4.cosmicadventures.domain.user.model.User
 import org.team.b4.cosmicadventures.global.StringMutableListConverter
 import org.team.b4.cosmicadventures.global.model.BaseEntity
@@ -11,10 +12,10 @@ import org.team.b4.cosmicadventures.global.model.BaseEntity
 @Table(name = "board")
 class Board(
     @Column(nullable = false)
-    val title: String,
+    var title: String,
 
     @Column(nullable = false)
-    val content: String,
+    var content: String,
 
     @Column(name = "name" )
     var nickName: String,
@@ -24,7 +25,7 @@ class Board(
 
     @Column(name = "image")
     @Convert(converter = StringMutableListConverter::class)
-    val image: MutableList<String>? = null,
+    var image: MutableList<String>? = null,
 
     @JoinColumn(name = "user_id", nullable = false)
     @ManyToOne
@@ -34,6 +35,10 @@ class Board(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
 
+    fun changeBoard(boardRequest: BoardRequest) {
+        this.title = boardRequest.title
+        this.content = boardRequest.content
+    }
     fun likeUp() {
         likeCount += 1
     }

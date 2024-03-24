@@ -6,15 +6,19 @@ import org.team.b4.cosmicadventures.domain.community.dto.BoardLikeDto
 import org.team.b4.cosmicadventures.domain.community.dto.BoardRequest
 import org.team.b4.cosmicadventures.domain.community.dto.BoardRetrieveDto
 import org.team.b4.cosmicadventures.global.security.UserPrincipal
+import kotlin.reflect.jvm.internal.impl.load.java.lazy.descriptors.DeclaredMemberIndex.Empty
 
 interface BoardService {
 
     // 게시글 생성
     fun createBoard(
-        boardRequest: BoardRequest, userPrincipal: UserPrincipal): BoardDto
+        boardRequest: BoardRequest, userPrincipal: UserPrincipal, imageList: MutableList<MultipartFile>
+    ): BoardDto
 
     // 게시글 수정
-    fun updateBoard(boardId: Long, boardRequest: BoardRequest, userPrincipal: UserPrincipal): BoardDto
+    fun updateBoard(
+        boardId: Long, boardRequest: BoardRequest, userPrincipal: UserPrincipal, imageList: MutableList<MultipartFile>
+    ): BoardDto
 
     // 게시글 삭제
     fun deleteBoard(boardId: Long, userPrincipal: UserPrincipal): String

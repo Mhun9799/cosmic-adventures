@@ -49,11 +49,11 @@ class CommentController(
     ): String =
         commentService.deleteComment(commentId, userPrincipal)
 
-    @Operation(summary = "댓글 좋아요")
-    @PostMapping("/{commentId}")
-    fun likeUpComment(
-        @PathVariable commentId: Long
-    ): ResponseEntity<CommentDto> {
-        return ResponseEntity.ok().body(commentService.likeUpComment(commentId))
-    }
+//    @Operation(summary = "댓글 좋아요")
+//    @PostMapping("/{commentId}")
+//    fun likeUpComment(
+//        @PathVariable commentId: Long
+//    ): ResponseEntity<CommentDto> {
+//        return ResponseEntity.ok().body(commentService.likeUpComment(commentId))
+//    }
 }

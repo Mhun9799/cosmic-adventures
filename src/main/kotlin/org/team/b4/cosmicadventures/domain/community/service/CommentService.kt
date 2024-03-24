@@ -10,5 +10,5 @@ interface CommentService {
         boardId: Long, commentId: Long, commentRequest: CommentRequest, userPrincipal: UserPrincipal
     ): CommentDto
     fun deleteComment(commentId: Long, userPrincipal: UserPrincipal): String
-    fun likeUpComment(commentId: Long): CommentDto
+//    fun likeUpComment(commentId: Long): CommentDto
 }

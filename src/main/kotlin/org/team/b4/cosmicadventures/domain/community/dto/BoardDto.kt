@@ -1,6 +1,6 @@
 package org.team.b4.cosmicadventures.domain.community.dto
-
 import org.team.b4.cosmicadventures.domain.community.model.Board
+import java.time.ZonedDateTime
 
 
 data class BoardDto(
@@ -9,6 +9,7 @@ data class BoardDto(
     val content: String,
     val name: String,
     val likeCount: Int,
+    val creatAt: ZonedDateTime,
     val image: MutableList<String>?
 ) {
     companion object {
@@ -19,6 +20,7 @@ data class BoardDto(
                 content = board.content,
                 name = board.nickName,
                 likeCount = board.likeCount,
+                creatAt = board.createdAt,
                 image = board.image
             )
     }
