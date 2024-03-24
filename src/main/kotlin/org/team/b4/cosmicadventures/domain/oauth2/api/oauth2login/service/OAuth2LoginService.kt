@@ -1,5 +1,7 @@
 package org.team.b4.cosmicadventures.domain.oauth2.api.oauth2login.service
 
+import jakarta.servlet.http.Cookie
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.stereotype.Service
 import org.team.b4.cosmicadventures.domain.oauth2.client.oauth2.OAuth2ClientService
 import org.team.b4.cosmicadventures.domain.oauth2.domain.entity.OAuth2Provider
@@ -15,12 +17,15 @@ class OAuth2LoginService(
     // 엑세스토큰으로 사용자정보 조회
     // 사용자정보로 SocailMember 있으면 조회 없으면 회원가입
     // socialMember 우리엑세스토큰 발급후 응답
-    fun login(provider: OAuth2Provider, authorizationCode: String): String {
+    fun login(provider: OAuth2Provider, authorizationCode: String, response: HttpServletResponse) {
         val socialMember = oAuth2ClientService.login(provider, authorizationCode)
             .let { socialMemberService.registerIfAbsent(it) }
         val subject = socialMember.id.toString()
         val email = socialMember.email
         val role = "USER"
-        return jwtPlugin.generateAccessToken(subject, email, role)
+        val accessToken = jwtPlugin.generateAccessToken(subject, email, role)
+        val cookie = Cookie("Authorization", accessToken)
+        cookie.path = "/" // 쿠키의 유효 경로 설정
+        response.addCookie(cookie)
     }
 }
