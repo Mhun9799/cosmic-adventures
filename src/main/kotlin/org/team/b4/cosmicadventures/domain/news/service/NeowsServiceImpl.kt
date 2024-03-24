@@ -49,17 +49,19 @@ class NeowsServiceImpl(
     }
 
     val neowsResponseExtractor: (JsonNode) -> News = { asteroidNode -> // Update the extractor
-        val neoID = asteroidNode["neo_reference_id"]?.asText() ?: "NULL"
-        val name = asteroidNode["name"]?.asText() ?: "NULL"
-        val jplUrl = asteroidNode["nasa_jpl_url"]?.asText() ?: "NULL"
+        val neowsDto = NeowsDto(
+            neoID = asteroidNode["neo_reference_id"]?.asText() ?: "NULL",
+            name = asteroidNode["name"]?.asText() ?: "NULL",
+            jplUrl = asteroidNode["nasa_jpl_url"]?.asText() ?: "NULL",
+        )
 
         News(
-            title = neoID,
-            body = "이름은 ${name}, 자세한 정보는 ${jplUrl}입니다.",
+            title = neowsDto.neoID,
+            body = "이름은 ${neowsDto.name}, 자세한 정보는 ${neowsDto.jplUrl}입니다.",
             detail = """
-            ID = ${neoID}
-            name = ${name}
-            link = ${jplUrl}
+            ID = ${neowsDto.neoID}
+            name = ${neowsDto.name}
+            link = ${neowsDto.jplUrl}
         """.trimIndent()
         )
     }
