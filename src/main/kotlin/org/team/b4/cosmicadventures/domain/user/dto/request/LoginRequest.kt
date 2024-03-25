@@ -3,6 +3,7 @@ package org.team.b4.cosmicadventures.domain.user.dto.request
 
 import jakarta.validation.constraints.Email
 import org.springframework.validation.annotation.Validated
+import org.team.b4.cosmicadventures.domain.user.model.Role
 import org.team.b4.cosmicadventures.global.validation.ValidPassword
 
 @Validated
@@ -14,7 +15,7 @@ data class LoginRequest(
     @field: ValidPassword
     val password: String,
 
-    val role : String,
+    val role : Role,
 
     val verificationCode: String
 )

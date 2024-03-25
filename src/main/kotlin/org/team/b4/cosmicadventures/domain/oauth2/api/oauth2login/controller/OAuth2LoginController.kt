@@ -25,8 +25,12 @@ class OAuth2LoginController(
     @GetMapping("/oauth2/callback/{provider}")
     fun callback(
         @PathVariable provider: OAuth2Provider,
-        @RequestParam(name = "code") authorizationCode: String
-    ): String {
-        return oAuth2LoginService.login(provider, authorizationCode)
+        @RequestParam(name = "code") authorizationCode: String,
+        response: HttpServletResponse
+    ) {
+        oAuth2LoginService.login(provider, authorizationCode, response)
+        // 리다이렉트할 URL로 설정
+        val redirectUrl = "http://localhost:9000"
+        response.sendRedirect(redirectUrl)
     }
 }

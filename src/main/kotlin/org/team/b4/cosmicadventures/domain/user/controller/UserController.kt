@@ -8,22 +8,24 @@ import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import org.team.b4.cosmicadventures.domain.user.dto.request.*
 import org.team.b4.cosmicadventures.domain.user.dto.response.LoginResponse
 import org.team.b4.cosmicadventures.domain.user.dto.response.UserResponse
+import org.team.b4.cosmicadventures.domain.user.repository.UserRepository
 import org.team.b4.cosmicadventures.domain.user.service.UserServiceImpl
 import org.team.b4.cosmicadventures.global.security.UserPrincipal
 import org.team.b4.cosmicadventures.global.security.jwt.JwtPlugin
+
 
 
 @RestController
 @RequestMapping("/api/v1/users")
 class UserController(
     private val jwtPlugin: JwtPlugin,
-    private val userService: UserServiceImpl
+    private val userService: UserServiceImpl,
+    private val userRepository: UserRepository
 ) {
 
     @Operation(summary = "회원가입")
@@ -68,6 +70,15 @@ class UserController(
     @GetMapping("/{userId}/profile")
     fun getUserProfile(@PathVariable userId: Long):ResponseEntity<UserResponse>{
         val userProfile = userService.getUserProfile(userId)
+        return ResponseEntity.ok(userProfile)
+    }
+    @GetMapping("/profile")
+    fun getUserProfile(): ResponseEntity<UserResponse> {
+        val authenticatedId: Long = (SecurityContextHolder.getContext().authentication.principal as? UserPrincipal)?.id
+            ?: throw IllegalStateException("로그인을 부터")
+        val user = userRepository.findById(authenticatedId)
+            .orElseThrow { IllegalArgumentException("해당 사용자를 찾을 수 없습니다.") }
+        val userProfile = userService.getUserProfile(authenticatedId)
         return ResponseEntity.ok(userProfile)
     }
 

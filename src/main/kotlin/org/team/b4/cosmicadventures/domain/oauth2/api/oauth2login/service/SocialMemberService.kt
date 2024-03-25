@@ -27,6 +27,7 @@ class SocialMemberService(
                 tlno = "",
                 role = Role.USER,
                 status = Status.NORMAL,
+
             )
             userRepository.save(newUser)
         }

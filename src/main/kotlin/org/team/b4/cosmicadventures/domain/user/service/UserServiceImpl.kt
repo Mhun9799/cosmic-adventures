@@ -9,6 +9,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.team.b4.cosmicadventures.global.openaI.SlangFilterService
 import org.team.b4.cosmicadventures.global.security.RefreshToken.model.RefreshToken
 import org.team.b4.cosmicadventures.global.exception.ModelNotFoundException
 import org.team.b4.cosmicadventures.global.security.jwt.JwtPlugin
@@ -78,10 +79,10 @@ class UserServiceImpl(
             )
         }
         refreshTokenRepository.save(RefreshToken(user = user, token = refreshToken.toString()))
-        // 쿠키에 엑세스 토큰 추가
-        val accessTokenCookie = Cookie("access_token", accessToken)
-        accessTokenCookie.path = "/"
-        response.addCookie(accessTokenCookie)
+        // 쿠키에 리프레쉬 토큰 추가
+        val refreshTokenCookie = Cookie("refresh_token", refreshToken)
+        refreshTokenCookie.path = "/"
+        response.addCookie(refreshTokenCookie)
         // 헤더에 엑세스 토큰 추가
         response.addHeader("Authorization", "Bearer $accessToken")
         return LoginResponse(
@@ -90,7 +91,6 @@ class UserServiceImpl(
     }
 
     override fun logout(response: HttpServletResponse, request: HttpServletRequest) {
-
 
         val accessToken = jwtPlugin.extractAccessTokenFromRequest(request)
         // 쿠키에서 엑세스 토큰 삭제
@@ -111,7 +111,6 @@ class UserServiceImpl(
         user.status = Status.WITHDRAWAL
         userRepository.save(user)
     }
-
 
     @Transactional
     override fun updatePassword(request: UpdateUserPasswordRequest) {
@@ -148,10 +147,10 @@ class UserServiceImpl(
             throw IllegalArgumentException("비밀번호와 확인 비밀번호가 일치하지 않습니다.")
         }
         // 프로필 사진 업로드 처리
-        val uploadedImageStrings = if (request.profilePicUrl != null && request.profilePicUrl!!.isNotEmpty()) {
+        val uploadedImageStrings = if (request.profilePicUrl != null && request.profilePicUrl.isNotEmpty()) {
             s3Service.upload(request.profilePicUrl!!, "profile").toMutableList()
         } else {
-            mutableListOf("https://imgur.com/S8jQ6wN")
+            mutableListOf("https://cdn.quasar.dev/img/boy-avatar.png") // 기본 이미지 URL로 대체
         }
         // 비밀번호 해싱
         val hashedPassword = passwordEncoder.encode(request.password)
@@ -180,11 +179,11 @@ class UserServiceImpl(
         val authenticatedId: Long = (SecurityContextHolder.getContext().authentication.principal as? UserPrincipal)?.id
             ?: throw IllegalStateException("로그인을 부터")
         if (userId != authenticatedId) {
-            throw IllegalArgumentException("프로필 조회 권한이 없습니다.") }
+            throw IllegalArgumentException("프로필 조회 권한이 없습니다.")
+        }
         val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException("해당 사용자를 찾을 수 없습니다.") }
         return UserResponse.from(user)
     }
-
 
     @Transactional
     override fun updateUserProfile(
@@ -194,7 +193,8 @@ class UserServiceImpl(
         val authenticatedId: Long = (SecurityContextHolder.getContext().authentication.principal as? UserPrincipal)?.id
             ?: throw IllegalStateException("로그인을 부터")
         if (userId != authenticatedId) {
-            throw IllegalArgumentException("프로필 수정 권한이 없습니다.") }
+            throw IllegalArgumentException("프로필 수정 권한이 없습니다.")
+        }
         val uploadedImageStrings = if (request.profilePicUrl != null && request.profilePicUrl!!.isNotEmpty()) {
             s3Service.upload(request.profilePicUrl!!, "profile").toMutableList()
         } else {
@@ -215,7 +215,7 @@ class UserServiceImpl(
             ?: throw IllegalArgumentException("이메일 혹은 핸드폰번호가 일치하지 않습니다.")
         val passwordCode = UUID.randomUUID().toString().substring(0, 6)
         val internationalPhoneNumber = "82" + phoneNumber.replace("-", "")
-        val message = "인증코드🗝️ $passwordCode"
+        val message = "인증코드🗝️ $passwordCode\n 코드를 이용하여 임시비밀번호를 받으세용"
         smsSender.sendSMS(internationalPhoneNumber, message)
         userRepository.save(user.apply { this.passwordCode = passwordCode })
         return true
@@ -251,5 +251,4 @@ class UserServiceImpl(
         return passwordChars
     }
 }
-
 
