@@ -21,12 +21,12 @@ class BoardController(
     private val boardService: BoardService
 ) {
     @Operation(summary = "게시글 목록 조회 작성일 기준")
-    @GetMapping
+    @GetMapping("/creates")
     fun getListBoardByCreateAT(
     ): ResponseEntity<List<BoardDto>> =
         ResponseEntity.ok().body(boardService.getListBoardByCreateAtASc())
     @Operation(summary = "게시글 목록 조회 좋아요 순")
-    @GetMapping("/like")
+    @GetMapping("/likes")
     fun getListBoardByLikeUp(
     ): ResponseEntity<List<BoardDto>> =
         ResponseEntity.ok().body(boardService.getListBoardByLikeUp())
@@ -46,9 +46,11 @@ class BoardController(
     fun createBoard(
         @ModelAttribute boardRequest: BoardRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
-    ): ResponseEntity<BoardDto> =
-        ResponseEntity.created(URI.create("/")).body(boardService.createBoard(boardRequest, userPrincipal))
-
+    ): ResponseEntity<BoardDto> {
+        val imageList = boardRequest.image ?: mutableListOf()
+        return ResponseEntity.created(URI.create("/"))
+            .body(boardService.createBoard(boardRequest, userPrincipal, imageList))
+    }
     @Operation(summary = "게시글 수정")
     @PutMapping(
         "/{boardId}",
@@ -59,9 +61,10 @@ class BoardController(
         @PathVariable boardId: Long,
         @ModelAttribute boardRequest: BoardRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
-    ): ResponseEntity<BoardDto> =
-        ResponseEntity.ok().body(boardService.updateBoard(boardId, boardRequest, userPrincipal))
-
+    ): ResponseEntity<BoardDto> {
+        val imageList = boardRequest.image ?: mutableListOf()
+        return ResponseEntity.ok().body(boardService.updateBoard(boardId, boardRequest, userPrincipal, imageList))
+    }
     @Operation(summary = "게시글 삭제")
     @DeleteMapping("/{boardId}")
     fun deleteBoard(

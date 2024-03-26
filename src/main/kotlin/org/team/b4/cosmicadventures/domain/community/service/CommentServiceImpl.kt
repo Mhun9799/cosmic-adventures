@@ -51,9 +51,9 @@ class CommentServiceImpl(
         return "댓글 삭제완료"
     }
 
-    override fun likeUpComment(commentId: Long): CommentDto {
-        val comment = commentRepository.findByIdOrNull(commentId) ?: throw ModelNotFoundException("comment", commentId)
-        comment.likeUp()
-        return CommentDto.from(comment)
-    }
+//    override fun likeUpComment(commentId: Long): CommentDto {
+//        val comment = commentRepository.findByIdOrNull(commentId) ?: throw ModelNotFoundException("comment", commentId)
+//        comment.likeUp()
+//        return CommentDto.from(comment)
+//    }
 }
