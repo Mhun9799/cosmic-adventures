@@ -9,6 +9,10 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.team.b4.cosmicadventures.domain.community.dto.*
+import org.team.b4.cosmicadventures.domain.community.repository.board.BoardLikeUpUserRepository
+import org.team.b4.cosmicadventures.domain.community.repository.board.BoardRepository
+import org.team.b4.cosmicadventures.domain.community.repository.comment.CommentRepository
 import org.team.b4.cosmicadventures.global.openaI.SlangFilterService
 import org.team.b4.cosmicadventures.global.security.RefreshToken.model.RefreshToken
 import org.team.b4.cosmicadventures.global.exception.ModelNotFoundException
@@ -43,8 +47,11 @@ class UserServiceImpl(
     private val emailService: EmailService,
     private val refreshTokenRepository: RefreshTokenRepository,
     private val smsSender: SMSSender,
+    private val boardRepository: BoardRepository,
+    private val commentRepository:CommentRepository,
+    private val boardLikeUpUserRepository: BoardLikeUpUserRepository
 
-    ) : UserService {
+) : UserService {
 
     override fun login(
         request: LoginRequest,
@@ -138,7 +145,7 @@ class UserServiceImpl(
     @Transactional
     override fun signUp(request: SignUpRequest): UserResponse {
         if (slangFilterService.isCleanText(request.introduction)) {
-            throw IllegalArgumentException("욕설금지🤬🤬🤬")
+            throw IllegalArgumentException("욕설감지 및 소개를 제대로해주세요💕💕")
         }
         if (userRepository.existsByEmail(request.email)) {
             throw IllegalStateException("이메일이 이미 사용중입니다.")
@@ -156,7 +163,7 @@ class UserServiceImpl(
         val hashedPassword = passwordEncoder.encode(request.password)
         // 사용자 정보 생성
         val user = User(
-            role = Role.USER,
+            role = request.role,
             name = request.name,
             email = request.email,
             password = hashedPassword,
@@ -176,11 +183,6 @@ class UserServiceImpl(
     }
 
     override fun getUserProfile(userId: Long): UserResponse {
-        val authenticatedId: Long = (SecurityContextHolder.getContext().authentication.principal as? UserPrincipal)?.id
-            ?: throw IllegalStateException("로그인을 부터")
-        if (userId != authenticatedId) {
-            throw IllegalArgumentException("프로필 조회 권한이 없습니다.")
-        }
         val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException("해당 사용자를 찾을 수 없습니다.") }
         return UserResponse.from(user)
     }
@@ -198,7 +200,7 @@ class UserServiceImpl(
         val uploadedImageStrings = if (request.profilePicUrl != null && request.profilePicUrl!!.isNotEmpty()) {
             s3Service.upload(request.profilePicUrl!!, "profile").toMutableList()
         } else {
-            mutableListOf("https://imgur.com/S8jQ6wN")
+            mutableListOf("https://cdn.quasar.dev/img/boy-avatar.png")
         }
         val user = userRepository.findByIdOrNull(userId) ?: throw ModelNotFoundException("User", userId)
         user.name = request.name
@@ -250,5 +252,24 @@ class UserServiceImpl(
         savedUser.verificationCode?.let { emailService.sendVerificationEmail(savedUser.email, it, passwordChars) }
         return passwordChars
     }
+    override fun getUserBoards(authenticatedId: Long): List<BoardDto> {
+        val boards = boardRepository.findByUserId(authenticatedId)
+        return boards.map { BoardDto.from(it) }
+    }
+    override fun getUserComments(authenticatedId: Long): List<CommentDto> {
+        val comments = commentRepository.findByUserId(authenticatedId)
+        return comments.map { CommentDto.from(it) }
+    }
+    override fun getLikedBoardsByUserId(authenticatedId: Long): List<LikedBoardDto> {
+        val likedBoardUsers = boardLikeUpUserRepository.findByUserId(authenticatedId)
+        return likedBoardUsers.map { LikedBoardDto.from(it.board) }
+    }
+
+    override fun getUserBoardDetails(authenticatedId: Long, boardId: Long): BoardDto {
+        val board = boardRepository.findById(boardId)
+            .orElseThrow { IllegalArgumentException("게시글을 찾을 수 없습니다. ID: $boardId") }
+        return BoardDto.from(board)
+    }
+
 }
 
