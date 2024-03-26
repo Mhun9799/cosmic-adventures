@@ -8,4 +8,6 @@ import org.team.b4.cosmicadventures.domain.user.model.User
 interface CommentRepository : JpaRepository<Comment, Long> {
 
     fun findByUser(user: User): List<Comment>
+
+    fun findByUserId(userId: Long): List<Comment>
 }

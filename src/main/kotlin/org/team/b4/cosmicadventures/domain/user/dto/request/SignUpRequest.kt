@@ -37,7 +37,7 @@ data class SignUpRequest(
 
     fun to(): User {
         return User(
-            role = Role.USER,
+            role = role,
             name = name,
             email = email,
             password = password,
